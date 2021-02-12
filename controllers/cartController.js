@@ -6,10 +6,13 @@ const PAGE_OFFSET = 0;
 
 let cartController = {
   getCart: (req, res) => {
-    return Cart.findOne({ include: 'items' })
+    console.log(req.session)
+    return Cart.findByPk(req.session.cartId, { include: 'items' })
       .then(cart => {
-        console.log(cart)
-        let totalPrice = cart.items.length > 0 ? cart.items.map(d => d.price * d.CartItem.quantity).reduce((a, b) => a + b) : 0
+        if (!cart) {
+          return res.render('cart')
+        }
+        const totalPrice = cart.items.length > 0 ? cart.items.map(d => d.price * d.CartItem.quantity).reduce((a, b) => a + b) : 0
         return res.render('cart', {
           cart: cart.toJSON(),
           totalPrice
@@ -17,33 +20,35 @@ let cartController = {
       })
       .catch(err => console.log(err.message))
   },
-  postCart: (req, res) => {
-    return Cart.findOrCreate({
-      where: {
-        id: req.session.cartId || 0,
-      },
-    }).spread(function (cart, created) {
-      return CartItem.findOrCreate({
+  // 放產品入購物車，使用者body會帶有產品id
+  postCart: async (req, res) => {
+    try {
+      const cart = await Cart.findOrCreate({
         where: {
-          CartId: cart.id,
-          ProductId: req.body.productId
+          id: req.session.cartId || 0
         },
-        default: {
-          CartId: cart.id,
-          ProductId: req.body.productId,
-        }
-      }).spread(function (cartItem, created) {
-        return cartItem.update({
-          quantity: (cartItem.quantity || 0) + 1,
-        })
-          .then((cartItem) => {
-            req.session.cartId = cart.id
-            return req.session.save(() => {
-              return res.redirect('back')
-            })
-          })
       })
-    });
+
+      const cartItem = await CartItem.findOrCreate({
+        where: {
+          CartId: cart[0].dataValues.id,
+          ProductId: req.body.productId
+        }
+      })
+
+      await cartItem[0].update({
+        quantity: (cartItem[0].dataValues.quantity || 0) + 1
+      })
+
+      req.session.cartId = cart[0].dataValues.id
+      req.session.save((err) => {
+        if (err) throw err
+        res.redirect('back')
+      })
+    } catch (err) {
+      console.log(err)
+    }
+
   },
   addCartItem: (req, res) => {
     CartItem.findByPk(req.params.id).then(cartItem => {

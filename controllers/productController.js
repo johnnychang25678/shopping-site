@@ -5,19 +5,30 @@ const PAGE_LIMIT = 3;
 const PAGE_OFFSET = 0;
 
 let productController = {
-  getProducts: (req, res) => {
-    Product.findAndCountAll({
-      offset: PAGE_OFFSET,
-      limit: PAGE_LIMIT,
-      raw: true,
-      nest: true
-    })
-      .then(products => {
-        return res.render('products', {
-          products
-        })
+  getProducts: async (req, res) => {
+    try {
+      const products = await Product.findAndCountAll({
+        offset: PAGE_OFFSET,
+        limit: PAGE_LIMIT,
+        raw: true,
+        nest: true
       })
-  },
-}
+      const cart = await Cart.findByPk(req.session.cartId, { include: 'items' })
+      let totalPrice = 0
+      if (!cart) return res.render('products', {
+        products,
+        totalPrice
+      })
+      totalPrice = cart.items.length > 0 ? cart.items.map(d => d.price * d.CartItem.quantity).reduce((a, b) => a + b) : 0
 
+      return res.render('products', {
+        products,
+        cart: cart.toJSON(),
+        totalPrice,
+      })
+    } catch (err) {
+      console.log(err)
+    }
+  }
+}
 module.exports = productController

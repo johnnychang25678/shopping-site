@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       Product.belongsToMany(models.Cart, {
-        as: 'Carts',
+        as: 'carts',
         through: {
           model: models.CartItem,
           unique: false
@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'ProductId'
       })
       Product.belongsToMany(models.Order, {
-        as: 'Orders',
+        as: 'orders',
         through: {
           model: models.OrderItem,
           unique: false

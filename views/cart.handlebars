@@ -63,6 +63,7 @@
 
 <div class="row">
   <div class="col-md-4">
+    {{!-- send cart information to order --}}
     <form action="order" method="POST">
       <div class="form-group">
         <label for="name">Name</label>
@@ -76,6 +77,7 @@
         <label for="address">Address</label>
         <input type="text" class="form-control" id="address" placeholder="Enter address" name="address">
       </div>
+      {{!-- type="hidden" to send data without user interfere --}}
       <input type="hidden" name="cartId" value="{{cart.id}}">
       <input type="hidden" name="amount" value="{{totalPrice}}">
       <input type="hidden" name="shipping_status" value="0">

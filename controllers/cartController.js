@@ -1,5 +1,6 @@
 const db = require('../models')
 const Cart = db.Cart
+const Product = db.Product
 const CartItem = db.CartItem
 const PAGE_LIMIT = 10;
 const PAGE_OFFSET = 0;
@@ -8,7 +9,9 @@ let cartController = {
   getCart: async (req, res) => {
     try {
       let totalPrice = 0
-      const cart = await Cart.findByPk(req.session.cartId, { include: 'items' })
+      const cart = await Cart.findByPk(req.session.cartId, {
+        include: [{ model: Product, as: 'items' }]
+      })
       if (!cart) return res.render('cart', { totalPrice })
 
       totalPrice = cart.items.length > 0 ? cart.items.map(d => d.price * d.CartItem.quantity).reduce((a, b) => a + b) : 0

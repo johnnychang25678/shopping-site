@@ -7,13 +7,17 @@ const PAGE_OFFSET = 0;
 let productController = {
   getProducts: async (req, res) => {
     try {
+      // 產品
       const products = await Product.findAndCountAll({
         offset: PAGE_OFFSET,
         limit: PAGE_LIMIT,
         raw: true,
         nest: true
       })
-      const cart = await Cart.findByPk(req.session.cartId, { include: 'items' })
+      // 購物車
+      const cart = await Cart.findByPk(req.session.cartId, {
+        include: [{ model: Product, as: 'items' }]
+      })
       let totalPrice = 0
       if (!cart) return res.render('products', {
         products,

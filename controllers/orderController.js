@@ -1,8 +1,17 @@
+const nodemailer = require('nodemailer')
 const db = require('../models')
 const Order = db.Order
 const Cart = db.Cart
 const OrderItem = db.OrderItem
 const Product = db.Product
+
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'zjps3407@gmail.com',
+    pass: process.env.GMAIL_PASSWORD
+  },
+});
 
 const orderController = {
   getOrders: async (req, res) => {
@@ -43,7 +52,17 @@ const orderController = {
         })
       })
 
-      await Promise.all(createOrderItems)
+      const mailOptions = {
+        from: 'zjps3407@gmail.com',
+        to: 'zjps3407+AC@gmail.com',
+        subject: `${order.id} 訂單成立`,
+        text: `${order.id} 訂單成立`,
+      }
+
+      const mailSent = await transporter.sendMail(mailOptions)
+      await Promise.all([...createOrderItems, mailSent])
+
+      console.log('Email sent: ' + mailSent.response) // email sent success message
 
       return res.redirect('/orders')
     } catch (err) {

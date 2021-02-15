@@ -1,3 +1,6 @@
+if (process.env.NODE_ENV !== 'produciton') {
+  require('dotenv').config()
+}
 const express = require('express')
 const path = require('path');
 const logger = require('morgan');

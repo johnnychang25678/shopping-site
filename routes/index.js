@@ -1,14 +1,23 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 
 const productController = require('../controllers/productController')
 const cartController = require('../controllers/cartController')
-const orderController = require('../controllers/orderController')
+const orderController = require('../controllers/orderController');
+const userController = require('../controllers/userController');
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
   res.render('index', { title: 'Express' });
 });
+
+// register
+router.get('/register', userController.registerPage) 
+router.post('/register', userController.register)
+
+router.get('/login', userController.login)
+
+
 
 router.get('/products', productController.getProducts)
 router.get('/cart', cartController.getCart)

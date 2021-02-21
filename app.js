@@ -2,16 +2,17 @@ if (process.env.NODE_ENV !== 'produciton') {
   require('dotenv').config()
 }
 const express = require('express')
-const path = require('path');
-const logger = require('morgan');
+const path = require('path')
+const logger = require('morgan')
 const session = require('express-session')
 const methodOverride = require('method-override')
+const flash = require('connect-flash')
 const handlebars = require('express-handlebars')
 
-const indexRouter = require('./routes/index');
-const usersRouter = require('./routes/users');
+const indexRouter = require('./routes/index')
+const usersRouter = require('./routes/users')
 
-const app = express();
+const app = express()
 const port = 3000
 
 // view engine setup
@@ -21,11 +22,12 @@ app.engine('handlebars', handlebars({
 }))
 app.set('view engine', 'handlebars')
 
-app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(logger('dev'))
+app.use(express.json())
+app.use(express.urlencoded({ extended: false }))
 app.use(methodOverride('_method'))
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(flash())
+app.use(express.static(path.join(__dirname, 'public')))
 
 app.use(session({
   secret: 'ac',
@@ -33,14 +35,20 @@ app.use(session({
   cookie: { maxAge: 80000 },
   resave: false,
   saveUninitialized: true,
-}));
+}))
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
+app.use((req, res, next) => {
+  res.locals.success_messages = req.flash('success_messages')
+  res.locals.error_messages = req.flash('error_messages')
+  next()
+})
+
+app.use('/', indexRouter)
+app.use('/users', usersRouter)
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`)
 })
 
 
-module.exports = app;
+module.exports = app

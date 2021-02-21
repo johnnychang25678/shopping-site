@@ -14,7 +14,7 @@
             <tr>
               <td>{{this.name}}</td>
               <td>{{this.OrderItem.quantity}}</td>
-              <td>{{this.price}}</td>
+              <td>{{formatDollar this.price}}</td>
             </tr>
           {{/each}}
           <tr>
@@ -23,7 +23,7 @@
               <h4>Total: </h4>
             </td>
             <td>
-              <h4>{{this.amount}}</h4>
+              <h4>{{formatDollar this.amount}}</h4>
             </td>
           </tr>
         </tbody>

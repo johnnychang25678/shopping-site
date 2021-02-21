@@ -5,4 +5,8 @@ module.exports = {
       }
       return options.inverse(this);
   },
+  formatDollar: function(amount) {
+    const number = new Intl.NumberFormat('en-US').format(amount)
+    return `$ ${number}`
+  }
 }

@@ -46,6 +46,10 @@ const userController = {
     return res.render('login')
   },
   login: (req, res) => {
+    if (req.user.isAdmin) {
+      req.flash('success_messages', 'Successful login!')
+      return res.redirect('/admin/products')
+    }
     req.flash('success_messages', 'Successful login!')
     return res.redirect('/products')
   },

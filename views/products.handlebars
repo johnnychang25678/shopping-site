@@ -1,3 +1,4 @@
+{{> message}}
 <div class="row">
   <div class="col-md-9">
     <div class="row">
@@ -11,7 +12,7 @@
               <span>{{this.description}}</span>
               </p>
               <div class="d-flex justify-content-between align-items-center">
-                <small class="text-muted">$ {{this.price}}</small>
+                <small class="text-muted">{{formatDollar this.price}}</small>
                 <div class="btn-group">
                   <form action="/cart" method="POST">
                     <input type="hidden" name="productId" value="{{this.id}}">
@@ -25,6 +26,7 @@
       {{/each}}
     </div>
   </div>
+  {{!-- shopping cart --}}
   <nav class="col-md-3 d-none d-md-block bg-light sidebar">
     <div class="sidebar-sticky">
       <ul class="list-group list-group-flush">
@@ -37,7 +39,7 @@
               <div class="col-md-8">
                 <div class="card-body">
                   <h5 class="card-title">{{this.name}}</h5>
-                  <p>${{this.price}}</p>
+                  <p>{{formatDollar this.price}}</p>
                   <div class="btn-group">
                     <form action="/cartItem/{{this.CartItem.id}}/add" method="POST">
                       <button type="submit" class="btn btn-sm btn-outline-secondary">+</button>

@@ -30,7 +30,7 @@ app.set('view engine', 'handlebars')
 
 // app.use(logger('dev'))
 app.use(express.json())
-app.use(express.urlencoded({ extended: false }))
+app.use(express.urlencoded({ extended: true }))
 app.use(methodOverride('_method'))
 app.use(express.static(path.join(__dirname, 'public')))
 
@@ -38,7 +38,7 @@ app.use(
   session({
     secret: 'ac',
     name: 'ac',
-    cookie: { maxAge: 80000 },
+    // cookie: { maxAge: 80000 },
     resave: false,
     saveUninitialized: true,
   })

@@ -32,6 +32,7 @@ router.get('/logout', userController.logout)
 
 // public routes
 router.get('/products', productController.getProducts)
+router.get('/products/:id', productController.getProduct)
 router.get('/cart', cartController.getCart)
 router.post('/cart', cartController.postCart)
 router.post('/cartItem/:id/add', cartController.addCartItem)
@@ -50,6 +51,9 @@ router.post(
 )
 
 // private routes for admin
+router.get('/admin', authenticatedAdmin, (req, res) =>
+  res.redirect('/admin/products')
+)
 router.get('/admin/products', authenticatedAdmin, adminController.getProducts)
 router.get(
   '/admin/products/add',
@@ -62,4 +66,10 @@ router.post(
   upload.single('image'),
   adminController.addProduct
 )
+router.get(
+  '/admin/products/:id',
+  authenticatedAdmin,
+  adminController.getProduct
+)
+
 module.exports = router

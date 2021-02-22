@@ -43,5 +43,9 @@ const productController = {
       return res.render('error', { message: err.message })
     }
   },
+  getProduct: async (req, res) => {
+    const product = await Product.findByPk(req.params.id)
+    return res.render('product', { product: product.toJSON() })
+  },
 }
 module.exports = productController

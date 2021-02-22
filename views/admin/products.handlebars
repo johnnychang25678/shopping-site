@@ -1,53 +1,45 @@
 {{> message}}
+<h1>Administration</h1>
+<div class="mb-2">
+  <a href="">Products</a> |
+  <a href="">Orders</a>
+</div>
 <form action="/admin/products/add" method="GET">
   <button class="btn btn-primary mb-3" type="submit">Add product</button>
 </form>
 
-
-<div class="card mb-3" style="max-width: 540px;">
-  <div class="row no-gutters">
-    <div class="col-md-8">
-      <div class="card-body">
-        <h5 class="card-title">Card title</h5>
-        <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content.
-          This content is a little bit longer.</p>
-        <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <img src="..." alt="...">
-    </div>
-  </div>
-</div>
-
-
-<div class="row">
-  <button class="btn btn-primary">Add product</button>
-  <div class="col-md-12">
-    <div class="row">
-      {{#each products.rows}}
-        <div class="col-md-4">
-          <div class="card mb-4 shadow-sm">
-            <img class="bd-placeholder-img card-img-top" width="100%" height="225" src={{this.image}}></img>
-            <div class="card-body">
-              <p class="card-text">
-              <h4><a href="/products/{{this.id}}">{{this.id}}. {{this.name}}</a></h4>
-              <span>{{this.description}}</span>
-              </p>
-              <div class="d-flex justify-content-between align-items-center">
-                <small class="text-muted">{{formatDollar this.price}}</small>
-                {{!-- <div class="btn-group">
-                  <form action="/cart" method="POST">
-                    <input type="hidden" name="productId" value="{{this.id}}">
-                    <button type="submit" class="btn btn-sm btn-outline-secondary">Add to Cart</button>
-                  </form>
-                </div> --}}
-              </div>
-            </div>
+<table class="table table-striped table-sm">
+  <thead class="thead-dark text-center">
+    <tr>
+      <th>Product id</th>
+      <th>Name</th>
+      <th>Description</th>
+      <th>Price</th>
+      <th>Operation</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each products}}
+      <tr>
+        <th class="text-center">{{this.id}}</th>
+        <td>{{this.name}}</td>
+        <td>{{this.description}}</td>
+        <td>{{formatDollar this.price}}</td>
+        <td>
+          <div class="d-flex">
+            <button class="btn btn-link">
+              <a href="/admin/products/{{this.id}}">Show</a>
+            </button>
+            <button class="btn btn-link">
+              <a href="">Edit</a>
+            </button>
+            <form action="" method="POST">
+              <button type="submit" class="btn btn-link">Delete</button>
+            </form>
           </div>
-        </div>
-      {{/each}}
-    </div>
-  </div>
 
-</div>
+        </td>
+      </tr>
+    {{/each}}
+  </tbody>
+</table>

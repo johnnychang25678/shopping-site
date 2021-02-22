@@ -9,9 +9,10 @@ const { Product } = db
 
 const adminController = {
   getProducts: async (req, res) => {
-    const products = await Product.findAndCountAll({
+    const products = await Product.findAll({
       raw: true,
       nest: true,
+      order: [['id', 'DESC']],
     })
 
     return res.render('admin/products', { products })
@@ -35,6 +36,10 @@ const adminController = {
     })
 
     return res.redirect('/admin/products')
+  },
+  getProduct: async (req, res) => {
+    const product = await Product.findByPk(req.params.id)
+    return res.render('admin/product', { product: product.toJSON() })
   },
 }
 

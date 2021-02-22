@@ -34,6 +34,9 @@
       {{/if}}
     </h5>
     <nav class="my-2 my-md-0 mr-md-3">
+      {{#if user.isAdmin}}
+        <a class="p-2 text-info" href="/admin">Admin</a>
+      {{/if}}
       {{#if user}}
         <a class="p-2 text-dark" href="/logout">Logout</a>
       {{else}}

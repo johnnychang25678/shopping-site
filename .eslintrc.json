@@ -10,8 +10,7 @@
     "prettier/prettier": [
       "error", 
       {
-        "singleQuote": true,
-        "treatUndefinedAsUnspecified": true
+        "singleQuote": true
       }
     ]
   }

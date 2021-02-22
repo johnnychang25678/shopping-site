@@ -13,8 +13,8 @@ module.exports = {
       password: {
         type: Sequelize.STRING,
       },
-      role: {
-        type: Sequelize.STRING,
+      isAdmin: {
+        type: Sequelize.BOOLEAN,
       },
       createdAt: {
         allowNull: false,

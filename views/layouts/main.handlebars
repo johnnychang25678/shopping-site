@@ -45,7 +45,9 @@
       <a class="p-2 text-dark" href="/register">Register</a>
       <a class="p-2 text-dark" href="/products">Products</a>
       <a class="p-2 text-dark" href="/cart">Cart</a>
-      <a class="p-2 text-dark" href="/orders">Orders</a>
+      {{#if user}}
+        <a class="p-2 text-dark" href="/orders">Orders</a>
+      {{/if}}
     </nav>
   </div>
 

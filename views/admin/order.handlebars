@@ -1,0 +1,77 @@
+<div class="d-flex w-100 flex-wrap mb-5">
+  <table class="table mr-5" style="flex-basis: 60%;">
+    <thead>
+      <tr>
+        <th scope="col">Order details</th>
+        <th scope="col">Quantity</th>
+        <th scope="col">Subtotal</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each this.items}}
+        <tr>
+          <td>
+            <a href="/products/{{this.id}}">{{this.name}}</a>
+
+          </td>
+          <td>{{this.OrderItem.quantity}}</td>
+          <td>{{formatDollar this.price}}</td>
+        </tr>
+      {{/each}}
+      <tr>
+        <td></td>
+        <td style="text-align: right;">
+          <h4>Total: </h4>
+        </td>
+        <td>
+          <h4>{{formatDollar this.amount}}</h4>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="bg-light p-3" style="width: 350px;">
+    <p class="font-weight-bold">
+      Order information {{#ifCond order.payment_status -1}} (Cancelled) {{/ifCond}}
+    </p>
+    <ul>
+      <li>Order id: {{order.id}}</li>
+      <li>Customer email: {{order.User.email}}</li>
+      <li>Customer name: {{order.name}}</li>
+      <li>Address: {{order.address}}</li>
+      <li>Phone #: {{order.phone}}</li>
+      <li>
+        shipping_status:
+        {{#ifCond order.shipping_status 0}}
+          Not shipped yet
+        {{/ifCond}}
+        {{#ifCond order.shipping_status 1}}
+          shipping
+        {{/ifCond}}
+        {{#ifCond order.shipping_status -1}}
+          cancelled
+        {{/ifCond}}
+      </li>
+      <li>
+        payment_status:
+        {{#ifCond order.payment_status 0}}
+          not paid yet
+        {{/ifCond}}
+        {{#ifCond order.payment_status 1}}
+          complete payment
+        {{/ifCond}}
+        {{#ifCond order.payment_status -1}}
+          cancelled
+        {{/ifCond}}
+      </li>
+    </ul>
+    {{#ifNot order.payment_status -1}}
+      <div class="btn-group ml-3">
+        <form action="/order/{{order.id}}/cancel" method="POST">
+          <button type="submit" class="btn btn-dark btn-sm mr-2">Cancel Order</button>
+        </form>
+        <a href="/order/{{order.id}}/payment"><button class="btn btn-sm btn-primary">Payment</button></a>
+      </div>
+  </div>
+  {{/ifNot}}
+</div>

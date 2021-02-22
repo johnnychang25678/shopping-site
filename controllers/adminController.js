@@ -3,7 +3,7 @@ const db = require('../models')
 
 const { IMGUR_CLIENT_ID } = process.env.IMGUR_CLIENT_ID
 
-const { Product } = db
+const { Product, Order, User } = db
 // const PAGE_LIMIT = 3
 // const PAGE_OFFSET = 0
 
@@ -40,6 +40,20 @@ const adminController = {
   getProduct: async (req, res) => {
     const product = await Product.findByPk(req.params.id)
     return res.render('admin/product', { product: product.toJSON() })
+  },
+  getOrders: async (req, res) => {
+    const orders = await Order.findAll({
+      include: [User],
+      raw: true,
+      nest: true,
+    })
+    // console.log(orders)
+    return res.render('admin/orders', { orders })
+  },
+  getOrder: async (req, res) => {
+    const order = await Order.findByPk(req.params.id, { include: [User] })
+    console.log(order.toJSON())
+    return res.render('admin/order', { order: order.toJSON() })
   },
 }
 

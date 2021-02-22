@@ -12,6 +12,11 @@ module.exports = {
   },
   authenticatedUser: (req, res, next) => {
     if (req.isAuthenticated()) {
+      // block admin
+      if (req.user.isAdmin) {
+        req.flash('error_messages', 'Admin cannot access!')
+        return res.redirect('/admin/products')
+      }
       return next()
     }
     req.flash('error_messages', 'You need to login first!')

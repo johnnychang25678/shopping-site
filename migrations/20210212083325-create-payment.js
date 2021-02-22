@@ -35,7 +35,8 @@ module.exports = {
       },
     })
   },
-  down: async (queryInterface, Sequelize) => {
+  // eslint-disable-next-line no-unused-vars
+  down: async (queryInterface, _Sequelize) => {
     await queryInterface.dropTable('Payments')
   },
 }

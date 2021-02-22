@@ -33,10 +33,11 @@ const cartController = {
   },
   // 放產品入購物車，使用者body會帶有產品id
   postCart: async (req, res) => {
+    // console.log(req.session.cartId)
     try {
       const cart = await Cart.findOrCreate({
         where: {
-          id: req.session.cartId || 0,
+          id: req.session.cartId || 0, // find id === 0, if not found, create
         },
       })
 
@@ -52,12 +53,14 @@ const cartController = {
       })
 
       req.session.cartId = cart[0].dataValues.id
-      req.session.save((err) => {
+      // save cartId to req.session
+      return req.session.save((err) => {
         if (err) throw err
-        res.redirect('back')
+        return res.redirect('back')
       })
     } catch (err) {
       console.log(err)
+      return res.render('error', { message: err.message })
     }
   },
   addCartItem: async (req, res) => {

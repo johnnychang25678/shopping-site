@@ -1,23 +1,24 @@
-<h1>顯示購物車</h1>
-
+<h1>Shopping Cart</h1>
 <div>
   <table class="table">
     <thead>
       <tr>
-        <th scope="col">#</th>
+        <th scope="col">Product</th>
         <th scope="col">Price</th>
         <th scope="col">quantity</th>
         <th scope="col">Subtotal</th>
-        <th scope="col">#</th>
+        <th scope="col">Remove</th>
       </tr>
     </thead>
     <tbody>
       {{#each cart.items}}
         <tr>
           <td>
-            <div style="display: flow-root;">
-              <img src="{{this.image}}" class="card-img" alt="..." style="height: 100px;width: auto;">
-              <span>{{this.name}}</span>
+            <div class="d-flex align-items-center">
+              <img src="{{this.image}}" class="card-img mr-3" alt="..." style="height: 100px;width: auto;">
+              <a href="/products/{{this.id}}">
+                {{this.name}}
+              </a>
             </div>
           </td>
           <td>
@@ -36,7 +37,7 @@
               </form>
             </div>
           </td>
-          <td>{{this.price}} * {{this.CartItem.quantity}}</td>
+          <td>{{formatDollar this.price}} * {{this.CartItem.quantity}}</td>
           <td>
             <form action="/cartItem/{{this.CartItem.id}}?_method=DELETE" method="POST">
               <button type="submit" class="btn btn-link">
@@ -53,7 +54,7 @@
           <h2>Total: </h2>
         </td>
         <td>
-          <h2>{{totalPrice}}</h2>
+          <h2>{{formatDollar totalPrice}}</h2>
         </td>
         <td></td>
       </tr>
@@ -61,28 +62,44 @@
   </table>
 </div>
 
-<div class="row">
-  <div class="col-md-4">
-    {{!-- send cart information to order --}}
-    <form action="order" method="POST">
-      <div class="form-group">
-        <label for="name">Name</label>
-        <input type="text" class="form-control" id="name" placeholder="Enter name" name="name">
-      </div>
-      <div class="form-group">
-        <label for="phone">Phone</label>
-        <input type="text" class="form-control" id="phone" placeholder="Enter phone" name="phone">
-      </div>
-      <div class="form-group">
-        <label for="address">Address</label>
-        <input type="text" class="form-control" id="address" placeholder="Enter address" name="address">
-      </div>
-      {{!-- type="hidden" to send data without user interfere --}}
-      <input type="hidden" name="cartId" value="{{cart.id}}">
-      <input type="hidden" name="amount" value="{{totalPrice}}">
-      <input type="hidden" name="shipping_status" value="0">
-      <input type="hidden" name="payment_status" value="0">
-      <button type="submit" class="btn btn-primary">Submit</button>
-    </form>
+{{#if user.isAdmin}}
+  <div class="alert alert-warning font-weight-bold w-50" role="alert">
+    Admin is not allowed to send order.
   </div>
-</div>
+{{else if user}}
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      <h1 style="font-size: 1.5rem;">Send Order</h1>
+      {{!-- send cart information to order --}}
+      <form action="/order" method="POST">
+        <div class="form-group">
+          <label for="email">Your Email</label>
+          <input type="email" class="form-control" id="email" placeholder="Enter email" name="email"
+            value="{{user.email}}">
+        </div>
+        <div class="form-group">
+          <label for="name">Your Name</label>
+          <input type="text" class="form-control" id="name" placeholder="Enter name" name="name">
+        </div>
+
+        <div class="form-group">
+          <label for="phone">Phone</label>
+          <input type="tel" class="form-control" id="phone" placeholder="Enter phone" name="phone">
+        </div>
+        <div class="form-group">
+          <label for="address">Address</label>
+          <input type="text" class="form-control" id="address" placeholder="Enter address" name="address">
+        </div>
+        {{!-- type="hidden" to send data without user interfere --}}
+        <input type="hidden" name="userId" value="{{user.id}}">
+        <input type="hidden" name="cartId" value="{{cart.id}}">
+        <input type="hidden" name="amount" value="{{totalPrice}}">
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+    </div>
+  </div>
+{{else}}
+  <div class="alert alert-warning font-weight-bold w-50" role="alert">
+    Reminder: You need to login to place an order.
+  </div>
+{{/if}}

@@ -1,6 +1,6 @@
 <main class="product-show d-flex flex-column align-items-center">
   {{#each orders}}
-    <div class="d-flex w-100 flex-wrap">
+    <div class="d-flex w-100 flex-wrap mb-5">
       <table class="table mr-5" style="flex-basis: 60%;">
         <thead>
           <tr>
@@ -12,7 +12,10 @@
         <tbody>
           {{#each this.items}}
             <tr>
-              <td>{{this.name}}</td>
+              <td>
+                <a href="/products/{{this.id}}">{{this.name}}</a>
+
+              </td>
               <td>{{this.OrderItem.quantity}}</td>
               <td>{{formatDollar this.price}}</td>
             </tr>
@@ -29,26 +32,49 @@
         </tbody>
       </table>
       <div class="bg-light p-3" style="width: 350px;">
-        <p class="font-weight-bold">Order information</p>
+        <p class="font-weight-bold">
+          Order information {{#ifCond this.payment_status -1}} (Cancelled) {{/ifCond}}
+        </p>
         <ul>
           <li>Order id: {{this.id}}</li>
+          <li>Your email: {{../user.email}}</li>
           <li>Your name: {{this.name}}</li>
           <li>Address: {{this.address}}</li>
           <li>Phone #: {{this.phone}}</li>
-          <li>shipping_status: {{this.shipping_status}}</li>
-          <li>payment_status: {{this.payment_status}}</li>
+          <li>
+            shipping_status:
+            {{#ifCond this.shipping_status 0}}
+              Not shipped yet
+            {{/ifCond}}
+            {{#ifCond this.shipping_status 1}}
+              shipping
+            {{/ifCond}}
+            {{#ifCond this.shipping_status -1}}
+              cancelled
+            {{/ifCond}}
+          </li>
+          <li>
+            payment_status:
+            {{#ifCond this.payment_status 0}}
+              not paid yet
+            {{/ifCond}}
+            {{#ifCond this.payment_status 1}}
+              complete payment
+            {{/ifCond}}
+            {{#ifCond this.payment_status -1}}
+              cancelled
+            {{/ifCond}}
+          </li>
         </ul>
-        <div class="btn-group ml-3">
-          <form action="/order/{{this.id}}/cancel" method="POST">
-            <button type="submit" class="btn btn-dark btn-sm mr-2">Cancel Order</button>
-          </form>
-          <a href="/order/{{this.id}}/payment"><button class="btn btn-sm btn-primary">Payment</button></a>
-        </div>
+        {{#ifNot this.payment_status -1}}
+          <div class="btn-group ml-3">
+            <form action="/order/{{this.id}}/cancel" method="POST">
+              <button type="submit" class="btn btn-dark btn-sm mr-2">Cancel Order</button>
+            </form>
+            <a href="/order/{{this.id}}/payment"><button class="btn btn-sm btn-primary">Payment</button></a>
+          </div>
       </div>
-
+      {{/ifNot}}
     </div>
-
-
-    <hr />
   {{/each}}
 </main>

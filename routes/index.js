@@ -34,9 +34,9 @@ router.get('/logout', userController.logout)
 router.get('/products', productController.getProducts)
 router.get('/products/:id', productController.getProduct)
 router.get('/cart', cartController.getCart)
-router.post('/cart', cartController.postCart)
-router.post('/cartItem/:id/add', cartController.addCartItem)
-router.post('/cartItem/:id/sub', cartController.subCartItem)
+router.post('/cart', cartController.postCart) // add to cart
+router.post('/cartItem/:id/add', cartController.addCartItem) // +1 existed product in cart
+router.post('/cartItem/:id/sub', cartController.subCartItem) // -1 existed product in cart
 router.delete('/cartItem/:id', cartController.deleteCartItem)
 
 // private routes for user
@@ -71,5 +71,7 @@ router.get(
   authenticatedAdmin,
   adminController.getProduct
 )
+router.get('/admin/orders', authenticatedAdmin, adminController.getOrders)
+router.get('/admin/orders/:id', authenticatedAdmin, adminController.getOrder)
 
 module.exports = router

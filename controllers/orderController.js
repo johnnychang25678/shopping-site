@@ -2,10 +2,8 @@
 const nodemailer = require('nodemailer')
 const db = require('../models')
 
-const { Order } = db
-const { Cart } = db
-const { OrderItem } = db
-const { Product } = db
+const { Order, Cart, OrderItem, Product, User } = db
+
 const getTradeInfo = require('../utils/tradeInfo')
 const { create_mpg_aes_decrypt } = require('../utils/encryptDecrypt')
 
@@ -20,10 +18,19 @@ const transporter = nodemailer.createTransport({
 const orderController = {
   getOrders: async (req, res) => {
     try {
-      const orders = await Order.findAll({
-        include: 'items',
-      })
-
+      let orders
+      if (req.user.isAdmin) {
+        orders = await Order.findAll({
+          include: [{ model: Product, as: 'items' }],
+        })
+      } else {
+        orders = await Order.findAll({
+          include: [{ model: Product, as: 'items' }],
+          where: { UserId: req.user.id },
+        })
+      }
+      console.log(orders)
+      console.log(orders.length)
       const ordersJSON = orders.map((order) => order.toJSON())
 
       return res.render('orders', {
@@ -36,25 +43,18 @@ const orderController = {
   },
   postOrder: async (req, res) => {
     try {
-      const {
-        cartId,
-        name,
-        address,
-        phone,
-        shipping_status,
-        payment_status,
-        amount,
-      } = req.body
+      const { userId, email, cartId, name, address, phone, amount } = req.body
       const findCart = Cart.findByPk(cartId, {
         include: [{ model: Product, as: 'items' }],
       })
       // Cart{id:..., items: [...]}
       const createOrder = Order.create({
+        UserId: userId,
         name,
         address,
         phone,
-        shipping_status,
-        payment_status,
+        shipping_status: 0,
+        payment_status: 0,
         amount,
       })
 
@@ -71,9 +71,9 @@ const orderController = {
 
       const mailOptions = {
         from: 'zjps3407@gmail.com',
-        to: 'zjps3407+AC@gmail.com',
-        subject: `${order.id} 訂單成立`,
-        text: `${order.id} 訂單成立`,
+        to: 'zjps3407+TestShoppingCart@gmail.com', // use email in real project
+        subject: `Order id: ${order.id} is created`,
+        text: `Order id: ${order.id} is created. You can now go to website and proceed with payment.`,
       }
 
       const mailSent = await transporter.sendMail(mailOptions)
@@ -84,6 +84,7 @@ const orderController = {
       return res.redirect('/orders')
     } catch (err) {
       console.log(err)
+      return res.render('error', { message: err.message })
     }
   },
   cancelOrder: async (req, res) => {
@@ -97,6 +98,7 @@ const orderController = {
       return res.redirect('back')
     } catch (err) {
       console.log(err)
+      return res.render('error', { message: err.message })
     }
   },
   getPayment: async (req, res) => {

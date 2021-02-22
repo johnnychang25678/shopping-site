@@ -25,6 +25,7 @@ router.post(
   }),
   userController.login
 )
+router.get('/logout', userController.logout)
 
 // public routes
 router.get('/products', productController.getProducts)

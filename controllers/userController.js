@@ -39,9 +39,19 @@ const userController = {
       return res.render('error', { message: err.message })
     }
   },
-  loginPage: (req, res) => res.render('login'),
+  loginPage: (req, res) => {
+    if (req.isAuthenticated()) {
+      return res.redirect('/products')
+    }
+    return res.render('login')
+  },
   login: (req, res) => {
     req.flash('success_messages', 'Successful login!')
+    return res.redirect('/products')
+  },
+  logout: (req, res) => {
+    req.flash(req.flash('success_messages', 'Successful logout!'))
+    req.logout()
     return res.redirect('/products')
   },
 }

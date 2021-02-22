@@ -1,26 +1,34 @@
+/* eslint-disable no-console */
 const db = require('../models')
-const Cart = db.Cart
-const Product = db.Product
-const CartItem = db.CartItem
-const PAGE_LIMIT = 10;
-const PAGE_OFFSET = 0;
 
-let cartController = {
+const { Cart } = db
+const { Product } = db
+const { CartItem } = db
+const PAGE_LIMIT = 10
+const PAGE_OFFSET = 0
+
+const cartController = {
   getCart: async (req, res) => {
     try {
       let totalPrice = 0
       const cart = await Cart.findByPk(req.session.cartId, {
-        include: [{ model: Product, as: 'items' }]
+        include: [{ model: Product, as: 'items' }],
       })
       if (!cart) return res.render('cart', { totalPrice })
 
-      totalPrice = cart.items.length > 0 ? cart.items.map(d => d.price * d.CartItem.quantity).reduce((a, b) => a + b) : 0
+      totalPrice =
+        cart.items.length > 0
+          ? cart.items
+              .map((d) => d.price * d.CartItem.quantity)
+              .reduce((a, b) => a + b)
+          : 0
       return res.render('cart', {
         cart: cart.toJSON(),
-        totalPrice
+        totalPrice,
       })
     } catch (err) {
       console.log(err)
+      return res.render('error', { message: err.message })
     }
   },
   // 放產品入購物車，使用者body會帶有產品id
@@ -28,19 +36,19 @@ let cartController = {
     try {
       const cart = await Cart.findOrCreate({
         where: {
-          id: req.session.cartId || 0
+          id: req.session.cartId || 0,
         },
       })
 
       const cartItem = await CartItem.findOrCreate({
         where: {
           CartId: cart[0].dataValues.id,
-          ProductId: req.body.productId
-        }
+          ProductId: req.body.productId,
+        },
       })
 
       await cartItem[0].update({
-        quantity: (cartItem[0].dataValues.quantity || 0) + 1
+        quantity: (cartItem[0].dataValues.quantity || 0) + 1,
       })
 
       req.session.cartId = cart[0].dataValues.id
@@ -56,11 +64,12 @@ let cartController = {
     try {
       const cartItem = await CartItem.findByPk(req.params.id)
       await cartItem.update({
-        quantity: cartItem.quantity + 1
+        quantity: cartItem.quantity + 1,
       })
       return res.redirect('back')
     } catch (err) {
       console.log(err)
+      return res.render('error', { message: err.message })
     }
   },
   subCartItem: async (req, res) => {
@@ -72,6 +81,7 @@ let cartController = {
       return res.redirect('back')
     } catch (err) {
       console.log(err)
+      return res.render('error', { message: err.message })
     }
   },
   deleteCartItem: async (req, res) => {
@@ -81,8 +91,9 @@ let cartController = {
       return res.redirect('back')
     } catch (err) {
       console.log(err)
+      return res.render('error', { message: err.message })
     }
-  }
+  },
 }
 
 module.exports = cartController

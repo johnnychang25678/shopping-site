@@ -1,41 +1,53 @@
+/* eslint-disable no-console */
 const nodemailer = require('nodemailer')
 const db = require('../models')
-const Order = db.Order
-const Cart = db.Cart
-const OrderItem = db.OrderItem
-const Product = db.Product
-const getTradeInfo = require('../utils/tradeInfo')
-const {create_mpg_aes_decrypt} = require('../utils/encryptDecrypt')
 
+const { Order } = db
+const { Cart } = db
+const { OrderItem } = db
+const { Product } = db
+const getTradeInfo = require('../utils/tradeInfo')
+const { create_mpg_aes_decrypt } = require('../utils/encryptDecrypt')
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
     user: 'zjps3407@gmail.com',
-    pass: process.env.GMAIL_PASSWORD
+    pass: process.env.GMAIL_PASSWORD,
   },
-});
+})
 
 const orderController = {
   getOrders: async (req, res) => {
     try {
       const orders = await Order.findAll({
-        include: 'items'
+        include: 'items',
       })
-    
-      const ordersJSON = orders.map(order => order.toJSON())
 
-      return res.render('orders', { 
-        orders: ordersJSON
+      const ordersJSON = orders.map((order) => order.toJSON())
+
+      return res.render('orders', {
+        orders: ordersJSON,
       })
     } catch (err) {
       console.log(err)
+      return res.render('error', { message: err.message })
     }
   },
   postOrder: async (req, res) => {
     try {
-      const { cartId, name, address, phone, shipping_status, payment_status, amount } = req.body
-      const findCart = Cart.findByPk(cartId, { include: [{ model: Product, as: 'items' }] })
+      const {
+        cartId,
+        name,
+        address,
+        phone,
+        shipping_status,
+        payment_status,
+        amount,
+      } = req.body
+      const findCart = Cart.findByPk(cartId, {
+        include: [{ model: Product, as: 'items' }],
+      })
       // Cart{id:..., items: [...]}
       const createOrder = Order.create({
         name,
@@ -43,19 +55,19 @@ const orderController = {
         phone,
         shipping_status,
         payment_status,
-        amount
+        amount,
       })
 
       const [cart, order] = await Promise.all([findCart, createOrder])
 
-      const createOrderItems = cart.items.map(product => {
-        return OrderItem.create({
+      const createOrderItems = cart.items.map((product) =>
+        OrderItem.create({
           OrderId: order.id,
           ProductId: product.id,
           price: product.price,
-          quantity: product.CartItem.quantity
+          quantity: product.CartItem.quantity,
         })
-      })
+      )
 
       const mailOptions = {
         from: 'zjps3407@gmail.com',
@@ -67,13 +79,12 @@ const orderController = {
       const mailSent = await transporter.sendMail(mailOptions)
       await Promise.all([...createOrderItems, mailSent])
 
-      console.log('Email sent: ' + mailSent.response) // email sent success message
+      console.log(`Email sent: ${mailSent.response}`) // email sent success message
 
       return res.redirect('/orders')
     } catch (err) {
       console.log(err)
     }
-
   },
   cancelOrder: async (req, res) => {
     try {
@@ -81,13 +92,12 @@ const orderController = {
       await order.update({
         ...req.body,
         shipping_status: '-1',
-        payment_status: '-1'
+        payment_status: '-1',
       })
       return res.redirect('back')
     } catch (err) {
       console.log(err)
     }
-
   },
   getPayment: async (req, res) => {
     try {
@@ -96,7 +106,11 @@ const orderController = {
       console.log('==========')
 
       const order = await Order.findByPk(req.params.id)
-      const tradeInfo = getTradeInfo(order.amount, '產品名稱', 'zjps3407@gmail.com')
+      const tradeInfo = getTradeInfo(
+        order.amount,
+        '產品名稱',
+        'zjps3407@gmail.com'
+      )
 
       console.log('========= req.body ===========')
       console.log(req.body)
@@ -106,17 +120,16 @@ const orderController = {
 
       const snUpdatedOrder = await order.update({
         ...req.body,
-        sn: tradeInfo.MerchantOrderNo
+        sn: tradeInfo.MerchantOrderNo,
       })
 
       return res.render('payment', {
         order: snUpdatedOrder.toJSON(),
-        tradeInfo
+        tradeInfo,
       })
     } catch (err) {
       console.log(err)
     }
-
   },
   spgatewayCallback: async (req, res) => {
     console.log('===== spgatewayCallback =====')
@@ -135,17 +148,16 @@ const orderController = {
     console.log(data)
 
     const orders = await Order.findAll({
-      where: { sn: data.Result.MerchantOrderNo }
+      where: { sn: data.Result.MerchantOrderNo },
     })
 
     await orders[0].update({
       ...req.body,
-      payment_status: 1
+      payment_status: 1,
     })
 
     return res.redirect('/orders')
-
-  }
+  },
 }
 
 module.exports = orderController

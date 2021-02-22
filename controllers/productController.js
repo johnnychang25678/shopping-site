@@ -1,10 +1,12 @@
+/* eslint-disable no-console */
 const db = require('../models')
-const Product = db.Product
-const Cart = db.Cart
-const PAGE_LIMIT = 3;
-const PAGE_OFFSET = 0;
 
-let productController = {
+const { Product } = db
+const { Cart } = db
+const PAGE_LIMIT = 3
+const PAGE_OFFSET = 0
+
+const productController = {
   getProducts: async (req, res) => {
     try {
       // 產品
@@ -12,18 +14,24 @@ let productController = {
         offset: PAGE_OFFSET,
         limit: PAGE_LIMIT,
         raw: true,
-        nest: true
+        nest: true,
       })
       // 購物車
       const cart = await Cart.findByPk(req.session.cartId, {
-        include: [{ model: Product, as: 'items' }]
+        include: [{ model: Product, as: 'items' }],
       })
       let totalPrice = 0
-      if (!cart) return res.render('products', {
-        products,
-        totalPrice
-      })
-      totalPrice = cart.items.length > 0 ? cart.items.map(d => d.price * d.CartItem.quantity).reduce((a, b) => a + b) : 0
+      if (!cart)
+        return res.render('products', {
+          products,
+          totalPrice,
+        })
+      totalPrice =
+        cart.items.length > 0
+          ? cart.items
+              .map((d) => d.price * d.CartItem.quantity)
+              .reduce((a, b) => a + b)
+          : 0
 
       return res.render('products', {
         products,
@@ -32,7 +40,8 @@ let productController = {
       })
     } catch (err) {
       console.log(err)
+      return res.render('error', { message: err.message })
     }
-  }
+  },
 }
 module.exports = productController

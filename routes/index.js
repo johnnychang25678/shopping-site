@@ -1,35 +1,44 @@
-const express = require('express');
-const router = express.Router();
+const express = require('express')
+const passport = require('passport')
+const auth = require('../middlewares/auth')
+
+const router = express.Router()
 
 const productController = require('../controllers/productController')
 const cartController = require('../controllers/cartController')
-const orderController = require('../controllers/orderController');
-const userController = require('../controllers/userController');
+const orderController = require('../controllers/orderController')
+const userController = require('../controllers/userController')
 
-/* GET home page. */
-router.get('/', function (req, res, next) {
-  res.render('index', { title: 'Express' });
-});
+// home page redirect to products
+router.get('/', (req, res) => res.redirect('/products'))
 
 // register
-router.get('/register', userController.registerPage) 
+router.get('/register', userController.registerPage)
 router.post('/register', userController.register)
 
-router.get('/login', userController.login)
+router.get('/login', userController.loginPage)
+router.post(
+  '/login',
+  passport.authenticate('local', {
+    failureRedirect: '/login',
+    failureFlash: true,
+  }),
+  userController.login
+)
 
-
-
+// public routes
 router.get('/products', productController.getProducts)
 router.get('/cart', cartController.getCart)
 router.post('/cart', cartController.postCart)
 router.post('/cartItem/:id/add', cartController.addCartItem)
 router.post('/cartItem/:id/sub', cartController.subCartItem)
 router.delete('/cartItem/:id', cartController.deleteCartItem)
-router.get('/orders', orderController.getOrders)
-router.post('/order', orderController.postOrder)
-router.post('/order/:id/cancel', orderController.cancelOrder)
 
-router.get('/order/:id/payment', orderController.getPayment)
-router.post('/spgateway/callback', orderController.spgatewayCallback)
+// private routes
+router.get('/orders', auth, orderController.getOrders)
+router.post('/order', auth, orderController.postOrder)
+router.post('/order/:id/cancel', auth, orderController.cancelOrder)
+router.get('/order/:id/payment', auth, orderController.getPayment)
+router.post('/spgateway/callback', auth, orderController.spgatewayCallback)
 
-module.exports = router;
+module.exports = router

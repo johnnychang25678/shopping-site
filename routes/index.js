@@ -73,7 +73,11 @@ router.get(
 )
 router.get('/admin/orders', authenticatedAdmin, adminController.getOrders)
 router.get('/admin/orders/:id', authenticatedAdmin, adminController.getOrder)
-
+router.post(
+  '/admin/order/:id/cancel',
+  authenticatedAdmin,
+  adminController.cancelOrder
+)
 // @todo:
 // 1. add a cancellation route for admin
 // 2. add admin edit product feature

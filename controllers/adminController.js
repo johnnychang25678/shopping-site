@@ -52,8 +52,22 @@ const adminController = {
   },
   getOrder: async (req, res) => {
     const order = await Order.findByPk(req.params.id, { include: [User] })
-    console.log(order.toJSON())
+    // console.log(order.toJSON())
     return res.render('admin/order', { order: order.toJSON() })
+  },
+  cancelOrder: async (req, res) => {
+    try {
+      const order = await Order.findByPk(req.params.id)
+      await order.update({
+        ...req.body,
+        shipping_status: '-1',
+        payment_status: '-1',
+      })
+      return res.redirect('back')
+    } catch (err) {
+      console.log(err)
+      return res.render('error', { message: err.message })
+    }
   },
 }
 

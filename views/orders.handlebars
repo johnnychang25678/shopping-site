@@ -68,7 +68,8 @@
         </ul>
         {{#ifNot this.payment_status -1}}
           <div class="btn-group ml-3">
-            <form action="/order/{{this.id}}/cancel" method="POST">
+            <form action="/order/{{this.id}}/cancel" method="POST"
+              onsubmit="return confirm('Are you sure you want to cancel the order?')">
               <button type="submit" class="btn btn-dark btn-sm mr-2">Cancel Order</button>
             </form>
             <a href="/order/{{this.id}}/payment"><button class="btn btn-sm btn-primary">Payment</button></a>

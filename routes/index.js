@@ -88,6 +88,11 @@ router.put(
   upload.single('image'),
   adminController.editProduct
 )
+router.delete(
+  '/admin/products/:id',
+  authenticatedAdmin,
+  adminController.deleteProduct
+)
 // view all orders
 router.get('/admin/orders', authenticatedAdmin, adminController.getOrders)
 // view single order
@@ -100,7 +105,10 @@ router.post(
 )
 // @todo:
 // 1. add a cancellation route for admin (done)
-// 2. add admin edit product feature
-// 3. complete single order view for admin
+// 2. add admin edit product feature (done)
+// 3. complete single order view for admin (done)
+// 4. add admin delete product feature
+// 5. add pagination for products
+// 6. add search function for products
 
 module.exports = router

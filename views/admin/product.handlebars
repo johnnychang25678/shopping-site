@@ -14,9 +14,15 @@
             <a href="/admin/products/{{product.id}}/edit">
               <button class="btn btn-primary mr-2">Edit</button>
             </a>
-            <form action="">
-              <button type="submit" class="btn btn-danger">Delete</button>
+            <form action="/admin/products/{{this.id}}?_method=DELETE" method="POST"
+              onsubmit="return confirm('Are you sure you want to delete the product?')">
+              <button type="submit" class="btn btn-danger mr-2">Delete</button>
             </form>
+            <a href="/admin/products">
+              <button class="btn btn-dark">
+                Back to products
+              </button>
+            </a>
           </div>
 
         </div>

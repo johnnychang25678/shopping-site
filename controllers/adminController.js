@@ -75,6 +75,11 @@ const adminController = {
     req.flash('success_messages', 'Edit product success.')
     return res.redirect('/admin/products')
   },
+  deleteProduct: async (req, res) => {
+    const product = await Product.findByPk(req.params.id)
+    await product.destroy()
+    return res.redirect('back')
+  },
   getOrders: async (req, res) => {
     const orders = await Order.findAll({
       include: [User],

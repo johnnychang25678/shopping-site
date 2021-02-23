@@ -46,12 +46,17 @@ const userController = {
     return res.render('login')
   },
   login: (req, res) => {
-    if (req.user.isAdmin) {
-      req.flash('success_messages', 'Successful login!')
-      return res.redirect('/admin/products')
-    }
+    const cookies = req.headers.cookie.split(';').reduce((a, c) => {
+      const data = c.trim().split('=')
+      // a[data[0]] = data[1]
+      // return a
+      return {
+        ...a,
+        [data[0]]: data[1], // ES6 syntax
+      }
+    }, {})
     req.flash('success_messages', 'Successful login!')
-    return res.redirect('/products')
+    return res.redirect(cookies.location)
   },
   logout: (req, res) => {
     req.flash(req.flash('success_messages', 'Successful logout!'))

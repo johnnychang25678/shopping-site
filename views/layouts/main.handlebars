@@ -40,7 +40,7 @@
       {{#if user}}
         <a class="p-2 text-dark" href="/logout">Logout</a>
       {{else}}
-        <a class="p-2 text-dark" href="/login">Login</a>
+        <a class="p-2 text-dark" href="/login" onclick="setCookie()">Login</a>
       {{/if}}
       <a class="p-2 text-dark" href="/register">Register</a>
       <a class="p-2 text-dark" href="/products">Products</a>
@@ -65,6 +65,12 @@
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
     integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
     crossorigin="anonymous"></script>
+  <script>
+    function setCookie() {
+      const location = window.location.href
+      document.cookie = `location=${location}`
+    } // to memorize user last visited page
+  </script>
 </body>
 
 </html>

@@ -85,8 +85,10 @@ const adminController = {
     return res.render('admin/orders', { orders })
   },
   getOrder: async (req, res) => {
-    const order = await Order.findByPk(req.params.id, { include: [User] })
-    // console.log(order.toJSON())
+    const order = await Order.findByPk(req.params.id, {
+      include: [User, { model: Product, as: 'items' }],
+    })
+    console.log(order.toJSON())
     return res.render('admin/order', { order: order.toJSON() })
   },
   cancelOrder: async (req, res) => {

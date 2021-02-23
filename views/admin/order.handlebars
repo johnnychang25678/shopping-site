@@ -8,11 +8,10 @@
       </tr>
     </thead>
     <tbody>
-      {{#each this.items}}
+      {{#each order.items}}
         <tr>
           <td>
-            <a href="/products/{{this.id}}">{{this.name}}</a>
-
+            <a href="/admin/products/{{this.id}}">{{this.name}}</a>
           </td>
           <td>{{this.OrderItem.quantity}}</td>
           <td>{{formatDollar this.price}}</td>
@@ -24,7 +23,7 @@
           <h4>Total: </h4>
         </td>
         <td>
-          <h4>{{formatDollar this.amount}}</h4>
+          <h4>{{formatDollar order.amount}}</h4>
         </td>
       </tr>
     </tbody>
@@ -65,13 +64,18 @@
         {{/ifCond}}
       </li>
     </ul>
-    {{#ifNot order.payment_status -1}}
-      <div class="btn-group ml-3">
-        <form action="/order/{{order.id}}/cancel" method="POST">
+
+    <div class="btn-group ml-3">
+      {{#ifNot order.payment_status -1}}
+        <form action="/order/{{order.id}}/cancel" method="POST"
+          onsubmit="return confirm('Are you sure you want to cancel the order?')">
           <button type="submit" class="btn btn-dark btn-sm mr-2">Cancel Order</button>
         </form>
-        <a href="/order/{{order.id}}/payment"><button class="btn btn-sm btn-primary">Payment</button></a>
-      </div>
+      {{/ifNot}}
+      <a href="/admin/orders">
+        <button class="btn btn-sm btn-primary">Back to orders</button>
+      </a>
+    </div>
   </div>
-  {{/ifNot}}
+
 </div>

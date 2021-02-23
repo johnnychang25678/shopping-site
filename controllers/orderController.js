@@ -29,8 +29,6 @@ const orderController = {
           where: { UserId: req.user.id },
         })
       }
-      console.log(orders)
-      console.log(orders.length)
       const ordersJSON = orders.map((order) => order.toJSON())
 
       return res.render('orders', {

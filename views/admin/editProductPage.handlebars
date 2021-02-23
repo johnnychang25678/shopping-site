@@ -1,23 +1,22 @@
 {{> message}}
-<h1>Add New Product</h1>
-<form action="/admin/products" method="POST" enctype="multipart/form-data">
-
+<h1>Edit Product Information</h1>
+<form action="/admin/products/{{product.id}}?_method=PUT" method="POST" enctype="multipart/form-data">
   <div class="form-group">
     <label for="name">Product Name</label>
-    <input type="text" class="form-control" name="name" id="name" placeholder="Enter name" value="{{name}}"
+    <input type="text" class="form-control" name="name" id="name" placeholder="Enter name" value="{{product.name}}"
       maxlength="255">
   </div>
 
   <div class="form-group">
     <label for="description">Description</label>
     <textarea class="form-control" id="description" name="description" rows="3"
-      maxlength="255">{{description}}</textarea>
+      maxlength="255">{{product.description}}</textarea>
   </div>
 
   <div class="form-group">
     <label for="price">Product Price</label>
-    <input type="number" class="form-control" name="price" id="price" placeholder="Enter price" value="{{price}}"
-      maxlength="255" min="0">
+    <input type="number" class="form-control" name="price" id="price" placeholder="Enter price"
+      value="{{product.price}}" maxlength="255" min="0">
   </div>
 
   <div class="form-group">

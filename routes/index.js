@@ -54,32 +54,52 @@ router.post(
 router.get('/admin', authenticatedAdmin, (req, res) =>
   res.redirect('/admin/products')
 )
+// view all products
 router.get('/admin/products', authenticatedAdmin, adminController.getProducts)
+// edit product page
+router.get(
+  '/admin/products/:id/edit',
+  authenticatedAdmin,
+  adminController.editProductPage
+)
+// add product page
 router.get(
   '/admin/products/add',
   authenticatedAdmin,
   adminController.addProductPage
 )
+// view single product, the /:id route has to be last to prevent incorrect routing
+router.get(
+  '/admin/products/:id',
+  authenticatedAdmin,
+  adminController.getProduct
+)
+// add product
 router.post(
   '/admin/products',
   authenticatedAdmin,
   upload.single('image'),
   adminController.addProduct
 )
-router.get(
+// edit product
+router.put(
   '/admin/products/:id',
   authenticatedAdmin,
-  adminController.getProduct
+  upload.single('image'),
+  adminController.editProduct
 )
+// view all orders
 router.get('/admin/orders', authenticatedAdmin, adminController.getOrders)
+// view single order
 router.get('/admin/orders/:id', authenticatedAdmin, adminController.getOrder)
+// cancel order
 router.post(
   '/admin/order/:id/cancel',
   authenticatedAdmin,
   adminController.cancelOrder
 )
 // @todo:
-// 1. add a cancellation route for admin
+// 1. add a cancellation route for admin (done)
 // 2. add admin edit product feature
 // 3. complete single order view for admin
 

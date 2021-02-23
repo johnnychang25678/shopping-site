@@ -34,12 +34,46 @@ const adminController = {
       price,
       image: img.data.link,
     })
-
+    req.flash('success_messages', 'Add product success.')
     return res.redirect('/admin/products')
   },
   getProduct: async (req, res) => {
     const product = await Product.findByPk(req.params.id)
     return res.render('admin/product', { product: product.toJSON() })
+  },
+  editProductPage: async (req, res) => {
+    const product = await Product.findByPk(req.params.id)
+    return res.render('admin/editProductPage', { product: product.toJSON() })
+  },
+  editProduct: async (req, res) => {
+    const { name, description, price } = req.body
+    if (!name || !description || !price) {
+      req.flash(
+        'error_messages',
+        'name, description, price fields are mandatory!'
+      )
+      return res.redirect(`/admin/products/${req.params.id}/edit`)
+    }
+    const product = await Product.findByPk(req.params.id)
+    if (req.file) {
+      imgur.setClientId(IMGUR_CLIENT_ID)
+      const img = await imgur.uploadFile(req.file.path)
+      await product.update({
+        name,
+        description,
+        price,
+        image: img.data.link,
+      })
+      req.flash('success_messages', 'Edit product success.')
+      return res.redirect('/admin/products')
+    }
+    await product.update({
+      name,
+      description,
+      price,
+    })
+    req.flash('success_messages', 'Edit product success.')
+    return res.redirect('/admin/products')
   },
   getOrders: async (req, res) => {
     const orders = await Order.findAll({

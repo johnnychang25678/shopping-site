@@ -1,6 +1,6 @@
 {{> message}}
 {{!-- pagination --}}
-<nav class="d-flex justify-content-center">
+<nav class="d-flex justify-content-center align-items-center">
   <ul class="pagination">
     <li class="page-item">
       <a class="page-link" href="/products?page={{prev}}" aria-label="Previous">
@@ -26,6 +26,20 @@
     </li>
   </ul>
 </nav>
+<div class="row">
+  <form action="/products" class="col-md-3">
+    <div class="input-group">
+      <input type="text" class="form-control" name="keyword" placeholder="search for product...">
+      <div class="input-group-append">
+        <button type="submit" class="input-group-text">Search</button>
+      </div>
+    </div>
+  </form>
+</div>
+{{#ifCond products 'no result'}}
+  <h2 class="mt-2">No search result...</h2>
+  <a href="/products">go back to products</a>
+{{/ifCond}}
 
 <div class="row">
   {{!-- products --}}
@@ -37,7 +51,9 @@
             <img class="bd-placeholder-img card-img-top" width="100%" height="225" src={{this.image}}></img>
             <div class="card-body pb-0">
               <p class="card-text">
-              <h4><a href="/products/{{this.id}}">{{this.id}}. {{this.name}}</a></h4>
+              <h3 style="font-size: 1.3rem;">
+                <a href="/products/{{this.id}}">{{this.id}}. {{this.name}}</a>
+              </h3>
               <span>{{this.description}}</span>
               </p>
               <div class="d-flex justify-content-between align-items-center">
@@ -95,7 +111,10 @@
       <hr>
       <li class="list-group-item d-flex align-items-center">
         Total: {{formatDollar totalPrice}}
-        <a href="/cart"><button class="btn btn-sm btn-primary ml-2">Go to Cart</button></a>
+        <a href="/cart">
+          <button class="btn btn-sm btn-primary ml-2">Go to Cart</button>
+        </a>
+        <small class="align-self-end ml-2">Go to cart to place the order!</small>
       </li>
     </div>
   </nav>

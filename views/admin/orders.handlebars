@@ -4,9 +4,14 @@
   <a href="/admin/products">Products</a> |
   <a href="/admin/orders">Orders</a>
 </div>
-<form action="/admin/products/add" method="GET">
-  <button class="btn btn-primary mb-3" type="submit">Add product</button>
-</form>
+<div style="font-size: smaller;">
+  status code:
+  <ul>
+    <li>0: pending</li>
+    <li>1: paid / shipped</li>
+    <li>-1: order cancelled</li>
+  </ul>
+</div>
 
 <table class="table table-striped table-sm">
   <thead class="thead-dark text-center">

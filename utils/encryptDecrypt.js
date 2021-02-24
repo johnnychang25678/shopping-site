@@ -6,6 +6,7 @@ const HashIV = process.env.HASH_IV
 
 function genDataChain(TradeInfo) {
   const results = []
+  // eslint-disable-next-line no-restricted-syntax
   for (const kv of Object.entries(TradeInfo)) {
     results.push(`${kv[0]}=${kv[1]}`)
   }
@@ -32,6 +33,7 @@ function create_mpg_aes_decrypt(TradeInfo) {
   decrypt.setAutoPadding(false)
   const text = decrypt.update(TradeInfo, 'hex', 'utf8')
   const plainText = text + decrypt.final('utf8')
+  // eslint-disable-next-line no-control-regex
   const result = plainText.replace(/[\x00-\x20]+/g, '')
   return result
 }

@@ -8,7 +8,6 @@ const pageLimit = 9
 
 const productController = {
   getProducts: async (req, res) => {
-    console.log(req.query)
     try {
       let offset = 0
       if (req.query.page) {

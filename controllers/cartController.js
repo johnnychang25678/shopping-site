@@ -1,11 +1,7 @@
 /* eslint-disable no-console */
 const db = require('../models')
 
-const { Cart } = db
-const { Product } = db
-const { CartItem } = db
-const PAGE_LIMIT = 10
-const PAGE_OFFSET = 0
+const { Cart, Product, CartItem } = db
 
 const cartController = {
   getCart: async (req, res) => {

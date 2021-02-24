@@ -83,12 +83,13 @@ const productController = {
     }
   },
   getProduct: async (req, res) => {
-    const product = await Product.findByPk(req.params.id)
-    return res.render('product', { product: product.toJSON() })
-  },
-  searchProduct: async (req, res) => {
-    console.log(req.query)
-    return res.redirect('back')
+    try {
+      const product = await Product.findByPk(req.params.id)
+      return res.render('product', { product: product.toJSON() })
+    } catch (err) {
+      console.log(err)
+      return res.render('error', { message: err.message })
+    }
   },
 }
 module.exports = productController

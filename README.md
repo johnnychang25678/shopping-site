@@ -12,6 +12,8 @@ A shopping site build with below tech stack:
 
 ## Features
 
+![](shopping-site-front.png)
+
 <font size="4">The site has three different roles: **Visitor**, **User**, and **Admin** </font>
 
 ### Visitor

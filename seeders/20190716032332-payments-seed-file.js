@@ -1,12 +1,11 @@
-'use strict';
-
+/* eslint-disable no-unused-vars */
 const faker = require('faker')
 
 module.exports = {
-  up: (queryInterface, Sequelize) => {
-    return queryInterface.bulkInsert('Payments',
-      Array.from({ length: 5 }).map((item, index) =>
-      ({
+  up: (queryInterface, Sequelize) =>
+    queryInterface.bulkInsert(
+      'Payments',
+      Array.from({ length: 5 }).map((item, index) => ({
         amount: faker.random.number(),
         sn: faker.random.number().toString(),
         payment_method: Math.floor(Math.random() * 3) + 1,
@@ -15,17 +14,10 @@ module.exports = {
         OrderId: Math.floor(Math.random() * 2) + 1,
         createdAt: new Date(),
         updatedAt: new Date(),
-      })
-      ), {});
-  },
+      })),
+      {}
+    ),
 
-  down: (queryInterface, Sequelize) => {
-    /*
-      Add reverting commands here.
-      Return a promise to correctly handle asynchronicity.
-
-      Example:
-      return queryInterface.bulkDelete('People', null, {});
-    */
-  }
-};
+  down: (queryInterface, Sequelize) =>
+    queryInterface.bulkDelete('Payments', null, {}),
+}

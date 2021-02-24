@@ -86,7 +86,7 @@ const adminController = {
       raw: true,
       nest: true,
     })
-    // console.log(orders)
+    console.log(orders)
     return res.render('admin/orders', { orders })
   },
   getOrder: async (req, res) => {

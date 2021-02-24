@@ -47,10 +47,10 @@
               Not shipped yet
             {{/ifCond}}
             {{#ifCond this.shipping_status 1}}
-              shipping
+              <strong>shipping</strong>
             {{/ifCond}}
             {{#ifCond this.shipping_status -1}}
-              cancelled
+              <strong>cancelled</strong>
             {{/ifCond}}
           </li>
           <li>
@@ -59,23 +59,24 @@
               not paid yet
             {{/ifCond}}
             {{#ifCond this.payment_status 1}}
-              complete payment
+              <strong>complete payment</strong>
             {{/ifCond}}
             {{#ifCond this.payment_status -1}}
-              cancelled
+              <strong>cancelled</strong>
             {{/ifCond}}
           </li>
         </ul>
         {{#ifNot this.payment_status -1}}
           <div class="btn-group ml-3">
-            <form action="/order/{{this.id}}/cancel" method="POST"
+            <form action="/orders/{{this.id}}/cancel" method="POST"
               onsubmit="return confirm('Are you sure you want to cancel the order?')">
               <button type="submit" class="btn btn-dark btn-sm mr-2">Cancel Order</button>
             </form>
-            <a href="/order/{{this.id}}/payment"><button class="btn btn-sm btn-primary">Payment</button></a>
+            <a href="/orders/{{this.id}}/payment"><button class="btn btn-sm btn-primary">Payment</button></a>
           </div>
+        {{/ifNot}}
       </div>
-      {{/ifNot}}
+
     </div>
   {{/each}}
 </main>

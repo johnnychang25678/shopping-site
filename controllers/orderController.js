@@ -1,8 +1,9 @@
+/* eslint-disable camelcase */
 /* eslint-disable no-console */
 const nodemailer = require('nodemailer')
 const db = require('../models')
 
-const { Order, Cart, OrderItem, Product, User } = db
+const { Order, Cart, OrderItem, Product } = db
 
 const getTradeInfo = require('../utils/tradeInfo')
 const { create_mpg_aes_decrypt } = require('../utils/encryptDecrypt')
@@ -10,7 +11,7 @@ const { create_mpg_aes_decrypt } = require('../utils/encryptDecrypt')
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'zjps3407@gmail.com',
+    user: process.env.MY_EMAIL,
     pass: process.env.GMAIL_PASSWORD,
   },
 })
@@ -41,6 +42,7 @@ const orderController = {
   },
   postOrder: async (req, res) => {
     try {
+      // eslint-disable-next-line no-unused-vars
       const { userId, email, cartId, name, address, phone, amount } = req.body
       const findCart = Cart.findByPk(cartId, {
         include: [{ model: Product, as: 'items' }],
@@ -68,8 +70,8 @@ const orderController = {
       )
 
       const mailOptions = {
-        from: 'zjps3407@gmail.com',
-        to: 'zjps3407+TestShoppingCart@gmail.com', // use email in real project
+        from: process.env.MY_EMAIL,
+        to: process.env.EMAIL_TO, // use email in real project
         subject: `Order id: ${order.id} is created`,
         text: `Order id: ${order.id} is created. You can now go to website and proceed with payment.`,
       }
@@ -109,14 +111,8 @@ const orderController = {
       const tradeInfo = getTradeInfo(
         order.amount,
         '產品名稱',
-        'zjps3407@gmail.com'
+        process.env.MY_EMAIL
       )
-
-      console.log('========= req.body ===========')
-      console.log(req.body)
-
-      console.log('========= tradeInfo ===========')
-      console.log(tradeInfo)
 
       const snUpdatedOrder = await order.update({
         ...req.body,
@@ -129,34 +125,28 @@ const orderController = {
       })
     } catch (err) {
       console.log(err)
+      return res.render('error', { message: err.message })
     }
   },
   spgatewayCallback: async (req, res) => {
-    console.log('===== spgatewayCallback =====')
-    console.log(req.method)
-    console.log(req.query)
-    console.log(req.body)
-    console.log('==========')
+    try {
+      // 解密藍新付款成功的notificaiton
+      const data = JSON.parse(create_mpg_aes_decrypt(req.body.TradeInfo))
 
-    console.log('===== spgatewayCallback: TradeInfo =====')
-    console.log(req.body.TradeInfo)
+      const orders = await Order.findAll({
+        where: { sn: data.Result.MerchantOrderNo },
+      })
 
-    // 解密藍新付款成功的notificaiton
-    const data = JSON.parse(create_mpg_aes_decrypt(req.body.TradeInfo))
+      await orders[0].update({
+        ...req.body,
+        payment_status: 1,
+      })
 
-    console.log('===== spgatewayCallback: create_mpg_aes_decrypt、data =====')
-    console.log(data)
-
-    const orders = await Order.findAll({
-      where: { sn: data.Result.MerchantOrderNo },
-    })
-
-    await orders[0].update({
-      ...req.body,
-      payment_status: 1,
-    })
-
-    return res.redirect('/orders')
+      return res.redirect('/orders')
+    } catch (err) {
+      console.log(err)
+      return res.render('error', { message: err.message })
+    }
   },
 }
 

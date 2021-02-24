@@ -10,7 +10,9 @@ const productController = require('../controllers/productController')
 const cartController = require('../controllers/cartController')
 const orderController = require('../controllers/orderController')
 const userController = require('../controllers/userController')
-const adminController = require('../controllers/adminController')
+
+const admin = require('./modules/admin')
+const orders = require('./modules/orders')
 
 // home page redirect to products
 router.get('/', (req, res) => res.redirect('/products'))
@@ -40,69 +42,22 @@ router.post('/cartItem/:id/sub', cartController.subCartItem) // -1 existed produ
 router.delete('/cartItem/:id', cartController.deleteCartItem)
 
 // private routes for user
-router.get('/orders', authenticatedUser, orderController.getOrders)
-router.post('/order', authenticatedUser, orderController.postOrder)
-router.post('/order/:id/cancel', authenticatedUser, orderController.cancelOrder)
-router.get('/order/:id/payment', authenticatedUser, orderController.getPayment)
-router.post(
-  '/spgateway/callback',
-  authenticatedUser,
-  orderController.spgatewayCallback
-)
+// router.get('/orders', authenticatedUser, orderController.getOrders)
+// router.post('/orders', authenticatedUser, orderController.postOrder)
+// router.post(
+//   '/orders/:id/cancel',
+//   authenticatedUser,
+//   orderController.cancelOrder
+// )
+// router.get('/orders/:id/payment', authenticatedUser, orderController.getPayment)
+// router.post(
+//   '/orders/spgateway/callback',
+//   authenticatedUser,
+//   orderController.spgatewayCallback
+// )
 
-// private routes for admin
-router.get('/admin', authenticatedAdmin, (req, res) =>
-  res.redirect('/admin/products')
-)
-// view all products
-router.get('/admin/products', authenticatedAdmin, adminController.getProducts)
-// edit product page
-router.get(
-  '/admin/products/:id/edit',
-  authenticatedAdmin,
-  adminController.editProductPage
-)
-// add product page
-router.get(
-  '/admin/products/add',
-  authenticatedAdmin,
-  adminController.addProductPage
-)
-// view single product, the /:id route has to be last to prevent incorrect routing
-router.get(
-  '/admin/products/:id',
-  authenticatedAdmin,
-  adminController.getProduct
-)
-// add product
-router.post(
-  '/admin/products',
-  authenticatedAdmin,
-  upload.single('image'),
-  adminController.addProduct
-)
-// edit product
-router.put(
-  '/admin/products/:id',
-  authenticatedAdmin,
-  upload.single('image'),
-  adminController.editProduct
-)
-router.delete(
-  '/admin/products/:id',
-  authenticatedAdmin,
-  adminController.deleteProduct
-)
-// view all orders
-router.get('/admin/orders', authenticatedAdmin, adminController.getOrders)
-// view single order
-router.get('/admin/orders/:id', authenticatedAdmin, adminController.getOrder)
-// cancel order
-router.post(
-  '/admin/order/:id/cancel',
-  authenticatedAdmin,
-  adminController.cancelOrder
-)
+router.use('/admin', authenticatedAdmin, admin)
+router.use('/orders', authenticatedUser, orders)
 // @todo:
 // 1. add a cancellation route for admin (done)
 // 2. add admin edit product feature (done)

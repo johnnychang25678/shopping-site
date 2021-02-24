@@ -1,8 +1,13 @@
-<h3>準備為訂單編號： {{order.id}} 付款 </h3>
-<h4>總價 {{order.amount}} </h4>
+<h1 class="text-black-80 font-weight-light">Ready to pay for
+  <strong>order id: {{order.id}}</strong>
+</h1>
+
+<h4 class="text-info mt-3 mb-3">Total amount: {{formatDollar order.amount}} </h4>
+
+
 
 <form name='Spgateway' action='{{tradeInfo.PayGateWay}}' method="POST">
-  <button type="submit" class="btn btn-primary">Payment</button>
+  <button type="submit" class="btn btn-info btn-lg">Click the button to pay</button>
   {{!-- MerchantID: --}}
   <input type="hidden" name="MerchantID" value="{{tradeInfo.MerchantID}}"><br>
   {{!-- TradeInfo: --}}

@@ -1,3 +1,4 @@
+/* eslint-disable eqeqeq */
 /* eslint-disable object-shorthand */
 /* eslint-disable func-names */
 module.exports = {

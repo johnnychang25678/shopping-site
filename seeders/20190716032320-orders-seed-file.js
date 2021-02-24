@@ -6,6 +6,7 @@ module.exports = {
     queryInterface.bulkInsert(
       'Orders',
       Array.from({ length: 2 }).map((item, index) => ({
+        id: index + 1,
         name: faker.commerce.productName(),
         phone: faker.phone.phoneNumber(),
         address: faker.address.streetAddress(),

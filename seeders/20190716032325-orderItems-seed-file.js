@@ -6,6 +6,7 @@ module.exports = {
     queryInterface.bulkInsert(
       'OrderItems',
       Array.from({ length: 10 }).map((item, index) => ({
+        id: index + 1,
         OrderId: Math.floor(Math.random() * 2) + 1,
         ProductId: Math.floor(Math.random() * 10) + 1,
         price: Math.floor(Math.random() * 500) + 1,

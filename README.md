@@ -30,6 +30,7 @@ All features same as **Visitor**, plus
 
 - User is able to login and logout
 - User is able to make an order
+- System will send an order confirmation email to User once order created
 - User is able to view all of its orders and orders' status
 - User is able to cancel the orders
 - User is able to make a payment with credit card

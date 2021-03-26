@@ -29,7 +29,6 @@ const cartController = {
   },
   // 放產品入購物車，使用者body會帶有產品id
   postCart: async (req, res) => {
-    // console.log(req.session.cartId)
     try {
       const cart = await Cart.findOrCreate({
         where: {

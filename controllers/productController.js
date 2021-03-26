@@ -50,7 +50,7 @@ const productController = {
       const next = currentPage + 1 > pageCount ? pageCount : currentPage + 1
 
       let totalPrice = 0
-      if (!cart)
+      if (!cart) {
         return res.render('products', {
           products,
           totalPrice,
@@ -59,7 +59,7 @@ const productController = {
           prev,
           next,
         })
-
+      }
       totalPrice =
         cart.items.length > 0
           ? cart.items

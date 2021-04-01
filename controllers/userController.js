@@ -1,8 +1,6 @@
 /* eslint-disable no-console */
 const bcrypt = require('bcryptjs')
-const db = require('../models')
-
-const { User } = db
+const query = require('../db')
 
 const userController = {
   registerPage: (req, res) => res.render('register'),
@@ -16,10 +14,10 @@ const userController = {
       }
 
       // check if user email already existed
-      const user = await User.findOne({
-        where: { email },
-      })
-      if (user) {
+      const checkUserSql = 'SELECT id FROM users WHERE email = ?'
+      const user = await query(checkUserSql, [email])
+
+      if (user.length) {
         req.flash('error_messages', 'This email already existed!')
         return res.redirect('/register')
       }
@@ -27,11 +25,10 @@ const userController = {
       // create user
       const salt = await bcrypt.genSalt(10)
       const hashedPassword = await bcrypt.hash(password, salt)
-      await User.create({
-        email,
-        password: hashedPassword,
-        role: 'user',
-      })
+      const addUserSql =
+        'INSERT INTO users(email, password, isAdmin) VALUES(?, ?, ?)'
+      await query(addUserSql, [email, hashedPassword, 0])
+
       req.flash('success_messages', 'Successfully registered！')
       return res.redirect('/login')
     } catch (err) {

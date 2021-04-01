@@ -10,7 +10,6 @@ const flash = require('connect-flash')
 const handlebars = require('express-handlebars')
 const indexRouter = require('./routes/index')
 const usePassport = require('./config/passport')
-const db = require('./db')
 
 const app = express()
 const port = 3000
@@ -47,13 +46,6 @@ app.use((req, res, next) => {
   res.locals.user = req.user
   res.locals.passportError = req.flash('error')
   next()
-})
-app.get('/', (req, res) => {
-  console.log('testing mysql')
-  db.query('SELECT * FROM users', (err, result) => {
-    if (err) console.log(err)
-    console.log(result)
-  })
 })
 
 app.use('/', indexRouter)

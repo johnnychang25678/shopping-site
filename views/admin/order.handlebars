@@ -8,12 +8,12 @@
       </tr>
     </thead>
     <tbody>
-      {{#each order.items}}
+      {{#each items}}
         <tr>
           <td>
-            <a href="/admin/products/{{this.id}}">{{this.name}}</a>
+            <a href="/admin/products/{{this.id}}">{{this.product}}</a>
           </td>
-          <td>{{this.OrderItem.quantity}}</td>
+          <td>{{this.quantity}}</td>
           <td>{{formatDollar this.price}}</td>
         </tr>
       {{/each}}
@@ -35,7 +35,7 @@
     </p>
     <ul>
       <li>Order id: {{order.id}}</li>
-      <li>Customer email: {{order.User.email}}</li>
+      <li>Customer email: {{order.email}}</li>
       <li>Customer name: {{order.name}}</li>
       <li>Address: {{order.address}}</li>
       <li>Phone #: {{order.phone}}</li>

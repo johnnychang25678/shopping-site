@@ -1,6 +1,6 @@
 const mysql = require('mysql')
 
-const connection = mysql.createConnection({
+const pool = mysql.createPool({
   host: '127.0.0.1',
   user: 'root',
   password: 'password',
@@ -8,20 +8,18 @@ const connection = mysql.createConnection({
   database: 'shopping_cart',
 })
 
-connection.connect((err) => {
-  if (err) throw err
-  console.log('connected!')
-})
+// eslint-disable-next-line arrow-body-style
+const query = (sql, values) => {
+  return new Promise((resolve, reject) => {
+    pool.getConnection((err, connection) => {
+      if (err) reject(err)
+      connection.query(sql, values, (err, results) => {
+        if (err) reject(err)
+        resolve(results)
+      })
+      connection.release()
+    })
+  })
+}
 
-module.exports = connection
-
-// const sql = 'SELECT * FROM users'
-
-// connection.query(sql, (err, result) => {
-//   if (err) {
-//     console.log(err)
-//   }
-//   console.log(result)
-// })
-
-// connection.end()
+module.exports = query

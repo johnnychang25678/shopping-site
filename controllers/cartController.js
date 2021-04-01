@@ -1,8 +1,5 @@
 /* eslint-disable no-console */
-const db = require('../models')
 const query = require('../db')
-
-const { Cart, Product, CartItem } = db
 
 const cartController = {
   getCart: async (req, res) => {

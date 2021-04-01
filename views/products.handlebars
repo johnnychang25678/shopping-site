@@ -1,8 +1,8 @@
 {{> message}}
 {{!-- pagination --}}
 <nav class="d-flex justify-content-center align-items-center">
-  <ul class="pagination">
-    <li class="page-item">
+  <ul class="pagination flex-wrap">
+    <li class=" page-item">
       <a class="page-link" href="/products?page={{prev}}" aria-label="Previous">
         <span aria-hidden="true">&laquo;</span>
       </a>
@@ -45,7 +45,7 @@
   {{!-- products --}}
   <div class="col-md-8">
     <div class="row">
-      {{#each products.rows}}
+      {{#each products}}
         <div class="col-md-4 col-sm-12 py-2">
           <div class="card mb-4 shadow-sm h-100">
             <img class="bd-placeholder-img card-img-top" width="100%" height="225" src={{this.image}}></img>
@@ -77,7 +77,7 @@
     <div class="sidebar-sticky mt-1">
       <ul class="list-group list-group-flush">
         <li class="list-group-item">
-          {{#each cart.items}}
+          {{#each cart}}
             <div class="row">
               <div class="col-4 d-flex align-items-center">
                 <img src="{{this.image}}" class="img-fluid" alt="...">
@@ -87,15 +87,15 @@
                   <p class="card-title font-weight-bold">{{this.name}}</p>
                   <p>{{formatDollar this.price}}</p>
                   <div class="btn-group">
-                    <form action="/cartItem/{{this.CartItem.id}}/add" method="POST">
+                    <form action="/cartItem/{{this.cartItemId}}/add" method="POST">
                       <button type="submit" class="btn btn-sm btn-outline-secondary">+</button>
                     </form>
-                    <span style="margin: 0 20px;">{{this.CartItem.quantity}}</span>
-                    <form action="/cartItem/{{this.CartItem.id}}/sub" method="POST">
+                    <span style="margin: 0 20px;">{{this.quantity}}</span>
+                    <form action="/cartItem/{{this.cartItemId}}/sub" method="POST">
                       <button type="submit" class="btn btn-sm btn-outline-secondary">-</button>
                     </form>
 
-                    <form action="/cartItem/{{this.CartItem.id}}?_method=DELETE" method="POST">
+                    <form action="/cartItem/{{this.cartItemId}}?_method=DELETE" method="POST">
                       <button type="submit" class="btn btn-link">
                         <i class="fas fa-trash"></i>
                       </button>

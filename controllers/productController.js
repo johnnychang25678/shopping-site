@@ -1,48 +1,53 @@
 /* eslint-disable no-console */
-const { Op } = require('sequelize')
-const db = require('../models')
-
-const { Product, Cart } = db
+const query = require('../db')
 
 const pageLimit = 9
 
 const productController = {
   getProducts: async (req, res) => {
     try {
+      const countTotalProducts = query('SELECT COUNT(*) FROM products')
+      const { keyword, page } = req.query
       let offset = 0
-      if (req.query.page) {
-        offset = (req.query.page - 1) * pageLimit
+      if (page) {
+        offset = (page - 1) * pageLimit
       }
-      // for search feature
-      let whereQuery = {}
-      if (!req.query.keyword || req.query.keyword.trim() === '') {
-        whereQuery = {}
+      let sql
+      if (!keyword || keyword.trim === '') {
+        sql = 'SELECT * FROM products LIMIT ?, ?'
       } else {
-        whereQuery.name = { [Op.substring]: `${req.query.keyword}` } // LIKE %keyword%
+        sql = `SELECT * FROM products WHERE name LIKE '%${keyword}%' LIMIT ?, ?`
       }
-      const productFindAll = Product.findAndCountAll({
-        where: whereQuery,
-        offset,
-        limit: pageLimit,
-        raw: true,
-        nest: true,
-      })
 
-      const cartFindbyPk = Cart.findByPk(req.session.cartId, {
-        include: [{ model: Product, as: 'items' }],
-      })
+      const findProducts = query(sql, [offset, pageLimit])
+
+      const cartSql =
+        'SELECT cartItems.id AS cartItemId, cartItems.CartId, cartItems.quantity, products.* FROM cartItems JOIN products ON cartItems.ProductId = products.id WHERE CartItems.CartId = ?'
+      const findCart = query(cartSql, [req.session.cartId])
 
       // eslint-disable-next-line prefer-const
-      let [products, cart] = await Promise.all([productFindAll, cartFindbyPk])
-
+      let [totalProducts, products, cart] = await Promise.all([
+        countTotalProducts,
+        findProducts,
+        findCart,
+      ])
+      console.log(products)
+      console.log(totalProducts)
       // show no result page if search no result
-      if (!products.rows.length) {
+      if (!products.length) {
         products = 'no result'
       }
 
       // pagination
-      const currentPage = Number(req.query.page) || 1
-      const pageCount = Math.ceil(products.count / pageLimit) // 12/9 = 1.33 = 2
+      let productCount
+      if (!keyword || keyword.trim === '') {
+        productCount = Object.values(totalProducts[0])[0]
+      } else {
+        productCount = products.length
+      }
+
+      const currentPage = Number(page) || 1
+      const pageCount = Math.ceil(productCount / pageLimit) // 12/9 = 1.33 = 2
       const totalPages = Array.from({ length: pageCount }).map(
         (_, index) => index + 1
       ) // [_, _] => [1, 2]
@@ -61,15 +66,15 @@ const productController = {
         })
       }
       totalPrice =
-        cart.items.length > 0
-          ? cart.items
-              .map((product) => product.price * product.CartItem.quantity)
+        cart.length > 0
+          ? cart
+              .map((product) => product.price * product.quantity)
               .reduce((a, b) => a + b)
           : 0
 
       return res.render('products', {
         products,
-        cart: cart.toJSON(),
+        cart,
         totalPrice,
         currentPage,
         totalPages,
@@ -83,8 +88,9 @@ const productController = {
   },
   getProduct: async (req, res) => {
     try {
-      const product = await Product.findByPk(req.params.id)
-      return res.render('product', { product: product.toJSON() })
+      const sql = 'SELECT * FROM products WHERE id = ?'
+      const product = await query(sql, [req.params.id])
+      return res.render('product', { product: product[0] })
     } catch (err) {
       console.log(err)
       return res.render('error', { message: err.message })

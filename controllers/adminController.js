@@ -1,6 +1,5 @@
 /* eslint-disable no-console */
 const imgur = require('imgur')
-// const db = require('../models')
 const query = require('../db')
 
 const { IMGUR_CLIENT_ID } = process.env.IMGUR_CLIENT_ID

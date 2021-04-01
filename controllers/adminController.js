@@ -155,12 +155,6 @@ const adminController = {
       const sql =
         'UPDATE orders SET shipping_status = ?, payment_status = ? WHERE id = ?'
       await query(sql, [-1, -1, req.params.id])
-      // const order = await Order.findByPk(req.params.id)
-      // await order.update({
-      //   ...req.body,
-      //   shipping_status: '-1',
-      //   payment_status: '-1',
-      // })
       return res.redirect('back')
     } catch (err) {
       console.log(err)

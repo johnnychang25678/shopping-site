@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 const db = require('../models')
+const query = require('../db')
 
 const { Cart, Product, CartItem } = db
 
@@ -7,19 +8,23 @@ const cartController = {
   getCart: async (req, res) => {
     try {
       let totalPrice = 0
-      const cart = await Cart.findByPk(req.session.cartId, {
-        include: [{ model: Product, as: 'items' }],
-      })
-      if (!cart) return res.render('cart', { totalPrice })
+      // const cart = await Cart.findByPk(req.session.cartId, {
+      //   include: [{ model: Product, as: 'items' }],
+      // })
+      const sql =
+        'SELECT cartItems.id AS cartItemId, cartItems.CartId, cartItems.quantity, products.* FROM cartItems JOIN products ON cartItems.ProductId = products.id WHERE CartItems.CartId = ?'
+      const cart = await query(sql, [req.session.cartId])
+
+      if (!cart.length) return res.render('cart', { totalPrice })
 
       totalPrice =
-        cart.items.length > 0
-          ? cart.items
-              .map((d) => d.price * d.CartItem.quantity)
+        cart.length > 0
+          ? cart
+              .map((item) => item.price * item.quantity)
               .reduce((a, b) => a + b)
           : 0
       return res.render('cart', {
-        cart: cart.toJSON(),
+        cart,
         totalPrice,
       })
     } catch (err) {
@@ -30,24 +35,31 @@ const cartController = {
   // 放產品入購物車，使用者body會帶有產品id
   postCart: async (req, res) => {
     try {
-      const cart = await Cart.findOrCreate({
-        where: {
-          id: req.session.cartId || 0, // find id === 0, if not found, create
-        },
-      })
+      if (!req.session.cartId) {
+        const insertCart = 'INSERT INTO carts VALUES(default, default, default)'
+        await query(insertCart)
+        const cartId = await query('SELECT LAST_INSERT_ID()')
+        // add session
+        req.session.cartId = Object.values(cartId[0])[0]
+      }
 
-      const cartItem = await CartItem.findOrCreate({
-        where: {
-          CartId: cart[0].dataValues.id,
-          ProductId: req.body.productId,
-        },
-      })
+      const itemSql =
+        'SELECT * FROM cartItems WHERE CartId = ? AND ProductID = ?'
+      const item = await query(itemSql, [
+        req.session.cartId,
+        req.body.productId,
+      ])
+      if (!item.length) {
+        console.log(req.body.productId)
+        const insertItem =
+          'INSERT INTO cartItems(CartId, ProductId, quantity) VALUES(?, ?, ?)'
+        await query(insertItem, [req.session.cartId, req.body.productId, 1])
+      } else {
+        const addItem =
+          'UPDATE cartItems SET quantity = quantity + 1 WHERE CartId = ? AND ProductId = ?'
+        await query(addItem, [req.session.cartId, req.body.productId])
+      }
 
-      await cartItem[0].update({
-        quantity: (cartItem[0].dataValues.quantity || 0) + 1,
-      })
-
-      req.session.cartId = cart[0].dataValues.id
       // save cartId to req.session
       return req.session.save((err) => {
         if (err) throw err
@@ -60,10 +72,8 @@ const cartController = {
   },
   addCartItem: async (req, res) => {
     try {
-      const cartItem = await CartItem.findByPk(req.params.id)
-      await cartItem.update({
-        quantity: cartItem.quantity + 1,
-      })
+      const sql = 'UPDATE cartItems SET quantity = quantity + 1 WHERE id = ?'
+      await query(sql, [req.params.id])
       return res.redirect('back')
     } catch (err) {
       console.log(err)
@@ -72,10 +82,16 @@ const cartController = {
   },
   subCartItem: async (req, res) => {
     try {
-      const cartItem = await CartItem.findByPk(req.params.id)
-      await cartItem.update({
-        quantity: cartItem.quantity - 1 >= 1 ? cartItem.quantity - 1 : 1,
-      })
+      const sqlQuantity = 'SELECT quantity FROM cartItems WHERE id = ?'
+      const result = await query(sqlQuantity, [req.params.id])
+      const currentQuantity = result[0].quantity
+      if (currentQuantity - 1 < 1) {
+        const sql = 'UPDATE cartItems SET quantity = ? WHERE id = ?'
+        await query(sql, [1, req.params.id])
+      } else {
+        const sql = 'UPDATE cartItems SET quantity = quantity - 1 WHERE id = ?'
+        await query(sql, [req.params.id])
+      }
       return res.redirect('back')
     } catch (err) {
       console.log(err)
@@ -84,8 +100,8 @@ const cartController = {
   },
   deleteCartItem: async (req, res) => {
     try {
-      const cartItem = await CartItem.findByPk(req.params.id)
-      await cartItem.destroy()
+      const sql = 'DELETE FROM cartItems WHERE id = ?'
+      await query(sql, [req.params.id])
       return res.redirect('back')
     } catch (err) {
       console.log(err)

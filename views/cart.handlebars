@@ -11,7 +11,7 @@
       </tr>
     </thead>
     <tbody>
-      {{#each cart.items}}
+      {{#each cart}}
         <tr>
           <td>
             <div class="d-flex align-items-center">
@@ -26,18 +26,18 @@
           </td>
           <td>
             <div style="display: flex;">
-              <form action="/cartItem/{{this.CartItem.id}}/add" method="POST">
+              <form action="/cartItem/{{this.cartItemId}}/add" method="POST">
                 <button type="submit" class="btn btn-sm btn-outline-secondary">+</button>
               </form>
               <span style="margin: 0 20px;">
-                {{this.CartItem.quantity}}
+                {{this.quantity}}
               </span>
-              <form action="/cartItem/{{this.CartItem.id}}/sub" method="POST">
+              <form action="/cartItem/{{this.cartItemId}}/sub" method="POST">
                 <button type="submit" class="btn btn-sm btn-outline-secondary">-</button>
               </form>
             </div>
           </td>
-          <td>{{formatDollar this.price}} * {{this.CartItem.quantity}}</td>
+          <td>{{formatDollar this.price}} * {{this.quantity}}</td>
           <td>
             <form action="/cartItem/{{this.CartItem.id}}?_method=DELETE" method="POST">
               <button type="submit" class="btn btn-link">

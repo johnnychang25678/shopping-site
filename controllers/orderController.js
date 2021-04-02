@@ -72,7 +72,7 @@ const orderController = {
       const createOrderItems = cartItems.map((item) => {
         const createOrderItemSql =
           'INSERT INTO orderItems(OrderId, ProductId, quantity) VALUES(?, ?, ?)'
-        query(createOrderItemSql, [
+        return query(createOrderItemSql, [
           order.insertId,
           item.ProductId,
           item.quantity,

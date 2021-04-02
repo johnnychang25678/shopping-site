@@ -1,9 +1,8 @@
 const passport = require('passport')
 const LocalStrategy = require('passport-local').Strategy
 const bcrypt = require('bcryptjs')
-const db = require('../models')
 
-const { User } = db
+const query = require('../db')
 
 module.exports = (app) => {
   app.use(passport.initialize())
@@ -13,10 +12,15 @@ module.exports = (app) => {
     new LocalStrategy(
       { usernameField: 'email' },
       async (email, password, done) => {
-        const user = await User.findOne({ where: { email } })
-        if (!user) {
-          return done(null, false, { message: 'This email already existed!' })
+        const sql = 'SELECT * FROM users WHERE email = ?'
+        const userSql = await query(sql, [email])
+
+        if (!userSql.length) {
+          return done(null, false, {
+            message: 'No user found, please register!',
+          })
         }
+        const user = userSql[0]
         const isMatch = await bcrypt.compare(password, user.password)
         if (!isMatch) {
           return done(null, false, { message: 'Email or Password incorrect.' })
@@ -31,8 +35,10 @@ module.exports = (app) => {
   })
   passport.deserializeUser(async (id, done) => {
     try {
-      const user = await User.findByPk(id)
-      done(null, user.toJSON())
+      const sql = 'SELECT * FROM users WHERE id = ?'
+      const userSql = await query(sql, [id])
+      const user = userSql[0]
+      done(null, user)
     } catch (err) {
       done(err, null)
     }

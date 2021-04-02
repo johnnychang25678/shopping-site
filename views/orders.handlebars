@@ -13,10 +13,10 @@
           {{#each this.items}}
             <tr>
               <td>
-                <a href="/products/{{this.id}}">{{this.name}}</a>
+                <a href="/products/{{this.ProductId}}">{{this.productName}}</a>
 
               </td>
-              <td>{{this.OrderItem.quantity}}</td>
+              <td>{{this.quantity}}</td>
               <td>{{formatDollar this.price}}</td>
             </tr>
           {{/each}}

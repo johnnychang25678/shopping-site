@@ -3,7 +3,6 @@ const imgur = require('imgur')
 const query = require('../db')
 
 const { IMGUR_CLIENT_ID } = process.env.IMGUR_CLIENT_ID
-// const { Product, Order, User } = db
 
 const adminController = {
   getProducts: async (req, res) => {
@@ -131,7 +130,7 @@ const adminController = {
   getOrder: async (req, res) => {
     try {
       const sql =
-        'SELECT orders.*, users.email, orderItems.quantity, orderItems.price, orderItems.ProductId, products.name AS productName FROM orders JOIN users ON orders.UserId = users.id JOIN OrderItems ON orders.id = orderItems.OrderId JOIN products ON OrderItems.ProductId = products.id where orders.id = ?'
+        'SELECT orders.*, users.email, orderItems.quantity, orderItems.ProductId, products.price, products.name AS productName FROM orders JOIN users ON orders.UserId = users.id JOIN OrderItems ON orders.id = orderItems.OrderId JOIN products ON OrderItems.ProductId = products.id where orders.id = ?'
       const orderSql = await query(sql, req.params.id)
       const order = orderSql[0]
       const items = orderSql.map((order) => ({
@@ -140,8 +139,6 @@ const adminController = {
         quantity: order.quantity,
         price: order.price,
       }))
-      // console.log(items)
-      // console.log(order)
 
       return res.render('admin/order', { order, items })
     } catch (err) {

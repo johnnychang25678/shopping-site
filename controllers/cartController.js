@@ -5,13 +5,11 @@ const cartController = {
   getCart: async (req, res) => {
     try {
       let totalPrice = 0
-      // const cart = await Cart.findByPk(req.session.cartId, {
-      //   include: [{ model: Product, as: 'items' }],
-      // })
       const sql =
-        'SELECT cartItems.id AS cartItemId, cartItems.CartId, cartItems.quantity, products.* FROM cartItems JOIN products ON cartItems.ProductId = products.id WHERE CartItems.CartId = ?'
-      const cart = await query(sql, [req.session.cartId])
+        'SELECT cartItems.id AS cartItemId, cartItems.CartId, cartItems.quantity, products.* FROM carts JOIN cartItems ON carts.id = cartItems.CartId JOIN products ON cartItems.ProductId = products.id WHERE CartItems.CartId = ?'
 
+      const cart = await query(sql, [req.session.cartId])
+      console.log('------ cart:', cart)
       if (!cart.length) return res.render('cart', { totalPrice })
 
       totalPrice =
@@ -22,6 +20,7 @@ const cartController = {
           : 0
       return res.render('cart', {
         cart,
+        cartId: cart[0].CartId,
         totalPrice,
       })
     } catch (err) {
@@ -33,11 +32,12 @@ const cartController = {
   postCart: async (req, res) => {
     try {
       if (!req.session.cartId) {
-        const insertCart = 'INSERT INTO carts VALUES(default, default, default)'
-        await query(insertCart)
-        const cartId = await query('SELECT LAST_INSERT_ID()')
+        const insertCartSql =
+          'INSERT INTO carts(createdAt, updatedAt) VALUES(default, default)'
+        const insertCart = await query(insertCartSql)
+
         // add session
-        req.session.cartId = Object.values(cartId[0])[0]
+        req.session.cartId = insertCart.insertId
       }
 
       const itemSql =
@@ -47,7 +47,6 @@ const cartController = {
         req.body.productId,
       ])
       if (!item.length) {
-        console.log(req.body.productId)
         const insertItem =
           'INSERT INTO cartItems(CartId, ProductId, quantity) VALUES(?, ?, ?)'
         await query(insertItem, [req.session.cartId, req.body.productId, 1])

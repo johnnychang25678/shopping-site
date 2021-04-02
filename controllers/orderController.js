@@ -1,9 +1,8 @@
 /* eslint-disable camelcase */
 /* eslint-disable no-console */
 const nodemailer = require('nodemailer')
-const db = require('../models')
 
-const { Order, Cart, OrderItem, Product } = db
+const query = require('../db')
 
 const getTradeInfo = require('../utils/tradeInfo')
 const { create_mpg_aes_decrypt } = require('../utils/encryptDecrypt')
@@ -19,21 +18,22 @@ const transporter = nodemailer.createTransport({
 const orderController = {
   getOrders: async (req, res) => {
     try {
-      let orders
-      if (req.user.isAdmin) {
-        orders = await Order.findAll({
-          include: [{ model: Product, as: 'items' }],
-        })
-      } else {
-        orders = await Order.findAll({
-          include: [{ model: Product, as: 'items' }],
-          where: { UserId: req.user.id },
-        })
-      }
-      const ordersJSON = orders.map((order) => order.toJSON())
+      const orderDataSql = 'SELECT * FROM orders WHERE UserId = ?'
+      const orderDataSqlResult = await query(orderDataSql, [req.user.id])
+
+      const orderItemsSql =
+        'SELECT orderItems.OrderId, orderItems.quantity, orderItems.ProductId, products.price, products.name AS productName FROM orders JOIN orderItems ON orders.id = orderItems.OrderId JOIN products ON orderItems.ProductId = products.id WHERE orders.UserId = ?'
+      const orderItemsSqlResult = await query(orderItemsSql, [req.user.id])
+
+      const orders = orderDataSqlResult.map((order, i) => ({
+        ...orderDataSqlResult[i],
+        items: orderItemsSqlResult.filter(
+          (item) => item.OrderId === orderDataSqlResult[i].id
+        ),
+      }))
 
       return res.render('orders', {
-        orders: ordersJSON,
+        orders,
       })
     } catch (err) {
       console.log(err)
@@ -44,39 +44,49 @@ const orderController = {
     try {
       // eslint-disable-next-line no-unused-vars
       const { userId, email, cartId, name, address, phone, amount } = req.body
-      const findCart = Cart.findByPk(cartId, {
-        include: [{ model: Product, as: 'items' }],
-      })
-      // Cart{id:..., items: [...]}
-      const createOrder = Order.create({
-        UserId: userId,
+
+      const cartItemsSql =
+        'SELECT * FROM cartItems JOIN products ON cartItems.ProductId = products.id WHERE cartItems.CartId = ?'
+      const cartItemsPromise = query(cartItemsSql, [cartId])
+
+      // create order
+      const createOrderSql =
+        'INSERT INTO orders(UserId, name, address, phone, shipping_status, payment_status, amount) VALUES(?, ?, ?, ?, ?, ?, ?)'
+
+      const orderPromise = query(createOrderSql, [
+        userId,
         name,
         address,
         phone,
-        shipping_status: 0,
-        payment_status: 0,
+        0,
+        0,
         amount,
+      ])
+
+      const [cartItems, order] = await Promise.all([
+        cartItemsPromise,
+        orderPromise,
+      ])
+
+      // craete orderItem
+      const createOrderItems = cartItems.map((item) => {
+        const createOrderItemSql =
+          'INSERT INTO orderItems(OrderId, ProductId, quantity) VALUES(?, ?, ?)'
+        query(createOrderItemSql, [
+          order.insertId,
+          item.ProductId,
+          item.quantity,
+        ])
       })
-
-      const [cart, order] = await Promise.all([findCart, createOrder])
-
-      const createOrderItems = cart.items.map((product) =>
-        OrderItem.create({
-          OrderId: order.id,
-          ProductId: product.id,
-          price: product.price,
-          quantity: product.CartItem.quantity,
-        })
-      )
 
       const mailOptions = {
         from: process.env.MY_EMAIL,
-        to: process.env.EMAIL_TO, // use email in real project
-        subject: `Order id: ${order.id} is created`,
-        text: `Order id: ${order.id} is created. You can now go to website and proceed with payment.`,
+        to: process.env.EMAIL_TO, // use customer email in real project
+        subject: `Order id: ${order.insertId} is created`,
+        text: `Order id: ${order.insertId} is created. You can now go to website and proceed with payment.`,
       }
+      const mailSent = transporter.sendMail(mailOptions)
 
-      const mailSent = await transporter.sendMail(mailOptions)
       await Promise.all([...createOrderItems, mailSent])
 
       console.log(`Email sent: ${mailSent.response}`) // email sent success message
@@ -89,12 +99,9 @@ const orderController = {
   },
   cancelOrder: async (req, res) => {
     try {
-      const order = await Order.findByPk(req.params.id)
-      await order.update({
-        ...req.body,
-        shipping_status: '-1',
-        payment_status: '-1',
-      })
+      const sql =
+        'UPDATE orders SET shipping_status = -1, payment_status = -1 WHERE orders.id = ?'
+      await query(sql, [req.params.id])
       return res.redirect('back')
     } catch (err) {
       console.log(err)
@@ -103,24 +110,21 @@ const orderController = {
   },
   getPayment: async (req, res) => {
     try {
-      console.log('===== getPayment =====')
-      console.log(req.params.id)
-      console.log('==========')
+      const orderSql =
+        'SELECT orders.id, orders.amount FROM orders WHERE id = ?'
+      const order = await query(orderSql, req.params.id)
 
-      const order = await Order.findByPk(req.params.id)
       const tradeInfo = getTradeInfo(
-        order.amount,
+        order[0].amount,
         '產品名稱',
         process.env.MY_EMAIL
       )
 
-      const snUpdatedOrder = await order.update({
-        ...req.body,
-        sn: tradeInfo.MerchantOrderNo,
-      })
+      const updateOrderSql = 'UPDATE orders SET sn = ? WHERE id = ?'
+      await query(updateOrderSql, [tradeInfo.MerchantOrderNo, req.params.id])
 
       return res.render('payment', {
-        order: snUpdatedOrder.toJSON(),
+        order: order[0],
         tradeInfo,
       })
     } catch (err) {
@@ -132,15 +136,8 @@ const orderController = {
     try {
       // 解密藍新付款成功的notificaiton
       const data = JSON.parse(create_mpg_aes_decrypt(req.body.TradeInfo))
-
-      const orders = await Order.findAll({
-        where: { sn: data.Result.MerchantOrderNo },
-      })
-
-      await orders[0].update({
-        ...req.body,
-        payment_status: 1,
-      })
+      const orderSql = 'UPDATE orders SET payment_status = 1 WHERE sn = ?'
+      await query(orderSql, data.Result.MerchantOrderNo)
 
       return res.redirect('/orders')
     } catch (err) {

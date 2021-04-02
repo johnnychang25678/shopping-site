@@ -31,8 +31,7 @@ const productController = {
         findProducts,
         findCart,
       ])
-      console.log(products)
-      console.log(totalProducts)
+
       // show no result page if search no result
       if (!products.length) {
         products = 'no result'

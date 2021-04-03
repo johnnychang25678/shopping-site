@@ -31,13 +31,18 @@ module.exports = (app) => {
   )
 
   passport.serializeUser((user, done) => {
-    done(null, user.id)
+    done(null, {
+      id: user.id,
+      email: user.email,
+      isAdmin: user.isAdmin,
+    })
   })
-  passport.deserializeUser(async (id, done) => {
+  passport.deserializeUser(async (user, done) => {
     try {
-      const sql = 'SELECT * FROM users WHERE id = ?'
-      const userSql = await query(sql, [id])
-      const user = userSql[0]
+      // const sql = 'SELECT id, email, isAdmin FROM users WHERE id = ?'
+      // const userSql = await query(sql, [id])
+      // const user = userSql[0]
+      console.log('Deserializing...: ', user)
       done(null, user)
     } catch (err) {
       done(err, null)

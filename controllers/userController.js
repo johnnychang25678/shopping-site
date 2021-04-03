@@ -57,7 +57,7 @@ const userController = {
   },
   logout: (req, res) => {
     req.flash(req.flash('success_messages', 'Successful logout!'))
-    req.logout()
+    req.session.destroy()
     return res.redirect('/products')
   },
 }

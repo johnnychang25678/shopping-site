@@ -6,9 +6,42 @@ A shopping site build with below tech stack:
 - `Express` as web server
 - `Handlebars` as view engine
 - `MySQL` as database
-- `Squelize` as ORM
 
 - Third party API to handle transactions: [NewebPay](https://www.newebpay.com/)
+
+## Live Demo
+
+The website is deployed to AWS.
+
+**Live URL:**
+
+https://tinyurl.com/jnshop
+
+**AWS services used:**
+
+- `Elastic Beanstalk`
+- `AWS RDS (MySQL)`
+
+#### Use below accounts to play around!
+
+**Admin:**
+```
+email: root@example.com
+
+password: 12345678
+```
+**User 1:**
+```
+email: user1@example.com
+
+password: 12345678
+```
+**User 2:**
+```
+email: user1@example.com
+
+password: 12345678
+```
 
 ## Features
 
@@ -44,7 +77,7 @@ All features same as **Visitor**, plus
 - Admin is able to cancel the orders
 - Admin is **not able to** make an order nor a payment
 
-## Quick Start
+## Start Locally
 
 #### 1. Clone this repository
 
@@ -76,6 +109,11 @@ MERCHANT_ID=
 HASH_KEY=
 HASH_IV=
 IMGUR_CLIENT_ID=
+DB_HOST=
+DB_USER=
+DB_PASSWORD=
+DB_PORT=
+DB_NAME=
 ```
 
 #### 5. Install ngrok for testing NewebPay
@@ -83,7 +121,7 @@ IMGUR_CLIENT_ID=
 - Download ngrok via offical site: https://ngrok.com/download
 - Recommend to use homebrew for MacOS: https://gist.github.com/wosephjeber/aa174fb851dfe87e644e
 
-#### 6. Set up MySQL database &
+#### 6. Set up MySQL database with Sequelize
 
 - Reference config/config.json to create a database locally
 - migrate database with sequelize
@@ -123,19 +161,20 @@ URL=https://yourNgrokUrl.ngrok.io
 #### 9. Use below accounts to play around!
 
 **Admin:**
-
+```
 email: root@example.com
 
 password: 12345678
-
+```
 **User 1:**
-
+```
 email: user1@example.com
 
 password: 12345678
-
+```
 **User 2:**
-
+```
 email: user1@example.com
 
 password: 12345678
+```

@@ -1,19 +1,20 @@
 /* eslint-disable camelcase */
 /* eslint-disable no-console */
-const nodemailer = require('nodemailer')
+// const nodemailer = require('nodemailer')
 
 const query = require('../db')
 
 const getTradeInfo = require('../utils/tradeInfo')
 const { create_mpg_aes_decrypt } = require('../utils/encryptDecrypt')
 
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.MY_EMAIL,
-    pass: process.env.GMAIL_PASSWORD,
-  },
-})
+// ************** comment out node mailer for security concern ****************
+// const transporter = nodemailer.createTransport({
+//   service: 'gmail',
+//   auth: {
+//     user: process.env.MY_EMAIL,
+//     pass: process.env.GMAIL_PASSWORD,
+//   },
+// })
 
 const orderController = {
   getOrders: async (req, res) => {
@@ -79,17 +80,18 @@ const orderController = {
         ])
       })
 
-      const mailOptions = {
-        from: process.env.MY_EMAIL,
-        to: process.env.EMAIL_TO, // use customer email in real project
-        subject: `Order id: ${order.insertId} is created`,
-        text: `Order id: ${order.insertId} is created. You can now go to website and proceed with payment.`,
-      }
-      const mailSent = transporter.sendMail(mailOptions)
+      // ************** comment out node mailer for security concern ****************
+      // const mailOptions = {
+      //   from: process.env.MY_EMAIL,
+      //   to: process.env.EMAIL_TO, // use customer email in real project
+      //   subject: `Order id: ${order.insertId} is created`,
+      //   text: `Order id: ${order.insertId} is created. You can now go to website and proceed with payment.`,
+      // }
+      // const mailSent = transporter.sendMail(mailOptions)
 
-      await Promise.all([...createOrderItems, mailSent])
+      await Promise.all([...createOrderItems])
 
-      console.log(`Email sent: ${mailSent.response}`) // email sent success message
+      // console.log(`Email sent: ${mailSent.response}`) // email sent success message
 
       return res.redirect('/orders')
     } catch (err) {

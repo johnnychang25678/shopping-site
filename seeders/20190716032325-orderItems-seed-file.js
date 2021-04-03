@@ -4,7 +4,7 @@
 module.exports = {
   up: (queryInterface, Sequelize) =>
     queryInterface.bulkInsert(
-      'OrderItems',
+      'orderItems',
       Array.from({ length: 10 }).map((item, index) => ({
         id: index + 1,
         OrderId: Math.floor(Math.random() * 2) + 1,
@@ -17,5 +17,5 @@ module.exports = {
     ),
 
   down: (queryInterface, Sequelize) =>
-    queryInterface.bulkDelete('OrderItems', null, {}),
+    queryInterface.bulkDelete('orderItems', null, {}),
 }

@@ -1,6 +1,6 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('OrderItems', {
+    await queryInterface.createTable('orderItems', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -13,24 +13,23 @@ module.exports = {
       ProductId: {
         type: Sequelize.INTEGER,
       },
-      price: {
-        type: Sequelize.INTEGER,
-      },
       quantity: {
         type: Sequelize.INTEGER,
       },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
+        default: Date.now(),
       },
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE,
+        default: Date.now(),
       },
     })
   },
   // eslint-disable-next-line no-unused-vars
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('OrderItems')
+    await queryInterface.dropTable('orderItems')
   },
 }

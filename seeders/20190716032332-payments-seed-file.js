@@ -4,7 +4,7 @@ const faker = require('faker')
 module.exports = {
   up: (queryInterface, Sequelize) =>
     queryInterface.bulkInsert(
-      'Payments',
+      'payments',
       Array.from({ length: 5 }).map((item, index) => ({
         id: index + 1,
         amount: faker.random.number(),
@@ -20,5 +20,5 @@ module.exports = {
     ),
 
   down: (queryInterface, Sequelize) =>
-    queryInterface.bulkDelete('Payments', null, {}),
+    queryInterface.bulkDelete('payments', null, {}),
 }

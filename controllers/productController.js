@@ -22,7 +22,7 @@ const productController = {
       const findProducts = query(sql, [offset, pageLimit])
 
       const cartSql =
-        'SELECT cartItems.id AS cartItemId, cartItems.CartId, cartItems.quantity, products.* FROM cartItems JOIN products ON cartItems.ProductId = products.id WHERE CartItems.CartId = ?'
+        'SELECT cartItems.id AS cartItemId, cartItems.CartId, cartItems.quantity, products.* FROM cartItems JOIN products ON cartItems.ProductId = products.id WHERE cartItems.CartId = ?'
       const findCart = query(cartSql, [req.session.cartId])
 
       // eslint-disable-next-line prefer-const

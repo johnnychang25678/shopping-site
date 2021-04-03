@@ -6,7 +6,7 @@ const cartController = {
     try {
       let totalPrice = 0
       const sql =
-        'SELECT cartItems.id AS cartItemId, cartItems.CartId, cartItems.quantity, products.* FROM carts JOIN cartItems ON carts.id = cartItems.CartId JOIN products ON cartItems.ProductId = products.id WHERE CartItems.CartId = ?'
+        'SELECT cartItems.id AS cartItemId, cartItems.CartId, cartItems.quantity, products.* FROM carts JOIN cartItems ON carts.id = cartItems.CartId JOIN products ON cartItems.ProductId = products.id WHERE cartItems.CartId = ?'
 
       const cart = await query(sql, [req.session.cartId])
       console.log('------ cart:', cart)

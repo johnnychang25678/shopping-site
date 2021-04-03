@@ -7,7 +7,7 @@ const { IMGUR_CLIENT_ID } = process.env.IMGUR_CLIENT_ID
 const adminController = {
   getProducts: async (req, res) => {
     try {
-      const sql = 'SELECT * FROM Products ORDER BY id DESC'
+      const sql = 'SELECT * FROM products ORDER BY id DESC'
       const products = await query(sql)
       return res.render('admin/products', { products })
     } catch (err) {
@@ -130,7 +130,7 @@ const adminController = {
   getOrder: async (req, res) => {
     try {
       const sql =
-        'SELECT orders.*, users.email, orderItems.quantity, orderItems.ProductId, products.price, products.name AS productName FROM orders JOIN users ON orders.UserId = users.id JOIN OrderItems ON orders.id = orderItems.OrderId JOIN products ON OrderItems.ProductId = products.id where orders.id = ?'
+        'SELECT orders.*, users.email, orderItems.quantity, orderItems.ProductId, products.price, products.name AS productName FROM orders JOIN users ON orders.UserId = users.id JOIN orderItems ON orders.id = orderItems.OrderId JOIN products ON orderItems.ProductId = products.id where orders.id = ?'
       const orderSql = await query(sql, req.params.id)
       const order = orderSql[0]
       const items = orderSql.map((order) => ({

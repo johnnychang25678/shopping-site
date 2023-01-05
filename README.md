@@ -9,40 +9,6 @@ A shopping site build with below tech stack:
 
 - Third party API to handle transactions: [NewebPay](https://www.newebpay.com/)
 
-## Live Demo
-
-The website is deployed to AWS.
-
-**Live URL:**
-
-https://tinyurl.com/jnshop
-
-**AWS services used:**
-
-- `Elastic Beanstalk`
-- `AWS RDS (MySQL)`
-
-#### Use below accounts to play around!
-
-**Admin:**
-```
-email: root@example.com
-
-password: 12345678
-```
-**User 1:**
-```
-email: user1@example.com
-
-password: 12345678
-```
-**User 2:**
-```
-email: user1@example.com
-
-password: 12345678
-```
-
 ## Features
 
 ![](shopping-site-front.png)
